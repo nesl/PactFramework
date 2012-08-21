@@ -184,12 +184,9 @@ public class MainPipeline extends ConfiguredPipeline {
     @Override
     public void updateConfig(String jsonString) {
 
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(jsonString);
-        JsonObject obj = element.getAsJsonObject();
-        String funfString = obj.getAsJsonObject("funf").toString();
-        String pactObj = obj.getAsJsonObject("pact").toString();
-
+        RulesParser parser = new RulesParser();
+        parser.loadConfigFromJson(jsonString);
+        final String funfString = parser.getFunfConfigString();
         super.updateConfig(funfString);
     }
 }
