@@ -1,0 +1,46 @@
+{
+"funf":
+{
+    "name": "funf",
+	"version":1,
+    "configUpdateUrl":"http:\/\/128.97.93.155:100\/config",
+    "configUpdatePeriod":3600,
+	"dataArchivePeriod":600,
+    "dataUploadUrl":"http:\/\/128.97.93.155:100\/data",
+    "dataUploadPeriod":3600,
+	"dataRequests":{
+		"edu.mit.media.funf.probe.builtin.LocationProbe": [
+            { "PERIOD": 900,  "DURATION": 30 },
+            { "PERIOD": 3600, "DURATION": 120 }
+        ],
+        "edu.mit.media.funf.probe.builtin.HardwareInfoProbe": [
+            { "PERIOD": 604800 }
+        ],
+        "edu.mit.media.funf.probe.builtin.BatteryProbe": [
+            { "PERIOD": 30 }
+        ],
+        "edu.mit.media.funf.probe.builtin.AccelerometerFeaturesProbe": [
+            {}
+        ]
+	}
+},
+"pact": {
+    "rules":[
+        {
+            "name": "Stupid Example",
+            "description": "Checking how rule parsing works",
+            "contexts": [
+                ["activity.walking","place.home"],
+                ["place.work"]
+            ],
+            "packages": [
+                "com.facebook.katana", "edu.ucla.nesl.pact.test", "alias:socialApps", "re:*facebook*", "re:*"
+             ]
+             "actions": {
+                "gps.perturb":{"MEAN":30, "VARIANCE":20},
+                "accelerometer.suppress":{}
+             }
+        }
+    ]
+}
+}

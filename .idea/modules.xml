@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ContextAwareRules/ContextAwareRules.iml" filepath="$PROJECT_DIR$/ContextAwareRules/ContextAwareRules.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FunfLibrary/FunfLibrary.iml" filepath="$PROJECT_DIR$/FunfLibrary/FunfLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RulesParser/RulesParser.iml" filepath="$PROJECT_DIR$/RulesParser/RulesParser.iml" />
+    </modules>
+  </component>
+</project>
+
