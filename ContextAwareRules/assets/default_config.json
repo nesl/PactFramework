@@ -35,7 +35,7 @@
             ],
             "packages": [
                 "com.facebook.katana", "edu.ucla.nesl.pact.test", "alias:socialApps", "re:*facebook*", "re:*"
-             ]
+             ],
              "actions": {
                 "gps.perturb":{"MEAN":30, "VARIANCE":20},
                 "accelerometer.suppress":{}
