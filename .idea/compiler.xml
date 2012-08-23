@@ -5,6 +5,7 @@
     <excludeFromCompile>
       <directory url="file://$PROJECT_DIR$/ContextAwareRules/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/FunfLibrary/gen" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/InterestingLocationProbe/gen" includeSubdirectories="true" />
     </excludeFromCompile>
     <resourceExtensions />
     <wildcardResourcePatterns>

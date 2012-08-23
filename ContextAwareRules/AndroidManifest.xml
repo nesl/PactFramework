@@ -43,6 +43,9 @@
         
         <service android:name="edu.mit.media.funf.probe.builtin.AudioFeaturesProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.AccelerometerFeaturesProbe"></service>
+
+        <!-- Pact Probes -->
+        <service android:name="edu.ucla.nesl.pact.InterestingLocationProbe"></service>
         
         <!-- Framework services -->
         <service android:name=".MainPipeline" android:exported="true">

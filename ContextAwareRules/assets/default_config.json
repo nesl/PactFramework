@@ -21,7 +21,11 @@
         ],
         "edu.mit.media.funf.probe.builtin.AccelerometerFeaturesProbe": [
             {}
-        ]
+        ],
+		"edu.ucla.nesl.pact.InterestingLocationProbe": [
+            { "PERIOD": 120, "DURATION": 30 },
+            { "PERIOD": 120, "DURATION": 30 }
+        ],
 	}
 },
 "pact": {
