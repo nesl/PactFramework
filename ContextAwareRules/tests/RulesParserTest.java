@@ -1,7 +1,9 @@
-import com.google.gson.JsonElement;
+import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import edu.mit.media.funf.IOUtils;
 import edu.ucla.nesl.pact.RulesParser;
+import edu.ucla.nesl.pact.config.Rule;
+import edu.ucla.nesl.pact.config.Config;
 import junit.framework.TestCase;
 
 import java.io.*;
@@ -41,7 +43,7 @@ public class RulesParserTest extends TestCase {
         String jsonString = getStringFromTestJsonFile("default_config.json");
         assertNotNull(jsonString);
 
-        assertFalse(ruleParser.loadConfigFromJson(jsonString));
+        assertFalse(ruleParser.loadConfigFromFunfConfigJson(jsonString));
 
     }
 
@@ -50,6 +52,23 @@ public class RulesParserTest extends TestCase {
         String jsonString = getStringFromTestJsonFile("default_config.json");
         assertNotNull(jsonString);
 
-        assertTrue(ruleParser.loadConfigFromJson(jsonString));
+        assertTrue(ruleParser.loadConfigFromFunfConfigJson(jsonString));
+    }
+
+    public void testRuleParser() {
+        Config config = new Config();
+
+        Rule rule = new Rule("Rule1", "Testing Rule1");
+        rule.addContext("location.home");
+        rule.addPackage("com.facebook.katana");
+        rule.addAction("gps.perturb", "{\"MEAN\":20, \"VARIANCE\"=30}");
+        rule.addAction("acclerometer.suppress", "{}");
+        config.addRule(rule);
+
+        RulesParser parser = new RulesParser();
+        parser.Initialize(config);
+
+        // TODO: Assert a bunch of stuff.
+
     }
 }

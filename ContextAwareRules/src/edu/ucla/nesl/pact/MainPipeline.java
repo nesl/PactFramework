@@ -7,9 +7,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.json.JSONException;
 
 import android.content.Context;
@@ -185,7 +182,7 @@ public class MainPipeline extends ConfiguredPipeline {
     public void updateConfig(String jsonString) {
 
         RulesParser parser = new RulesParser();
-        parser.loadConfigFromJson(jsonString);
+        parser.loadConfigFromFunfConfigJson(jsonString);
         final String funfString = parser.getFunfConfigString();
         super.updateConfig(funfString);
     }

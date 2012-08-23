@@ -1,23 +1,23 @@
 package edu.ucla.nesl.pact;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
+import edu.ucla.nesl.pact.config.Config;
 
 public class RulesParser {
     private String mFunfString;
 
-    public boolean loadConfigFromJson(String jsonString) {
+    public boolean loadConfigFromFunfConfigJson(String jsonString) {
         JsonParser parser = new JsonParser();
 
         try {
             JsonElement rootElement = parser.parse(jsonString);
             JsonObject obj = rootElement.getAsJsonObject();
             mFunfString = obj.getAsJsonObject("funf").toString();
-            String pactObj = obj.getAsJsonObject("pact").toString();
 
-            // TODO: PARSE THIS INTO A DATA STRUCTURE.
+            Gson gson = new Gson();
+            final Config config =
+                    gson.fromJson(obj.get("pact"), Config.class);
+            Initialize(config);
 
         } catch (JsonSyntaxException ex) {
             ex.printStackTrace();
@@ -29,6 +29,11 @@ public class RulesParser {
     public String getFunfConfigString() {
         return mFunfString;
     }
+
+    public void Initialize(Config config) {
+
+    }
+
 
 
 }
