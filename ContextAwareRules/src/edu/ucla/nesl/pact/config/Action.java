@@ -1,28 +1,31 @@
 package edu.ucla.nesl.pact.config;
+
 public class Action {
-    private String name;
-    private String params;
 
-    public Action() { }
+  private String name;
+  private String params;
 
-    public Action(String name, String params) {
-         setName(name);
-         setParams(params);
-    }
+  public Action() {
+  }
 
-    public String getName() {
-        return name;
-    }
+  public Action(String name, String params) {
+    setName(name);
+    setParams(params);
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getParams() {
-        return params;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setParams(String params) {
-        this.params = params;
-    }
+  public String getParams() {
+    return params;
+  }
+
+  public void setParams(String params) {
+    this.params = params;
+  }
 }

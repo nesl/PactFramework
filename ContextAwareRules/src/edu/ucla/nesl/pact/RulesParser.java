@@ -1,12 +1,17 @@
 package edu.ucla.nesl.pact;
 
-import com.google.gson.*;
-import edu.ucla.nesl.pact.config.Config;
-import edu.ucla.nesl.pact.config.Rule;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+import edu.ucla.nesl.pact.config.Config;
+import edu.ucla.nesl.pact.config.Rule;
 
 public class RulesParser {
     private String mFunfString;
@@ -31,8 +36,9 @@ public class RulesParser {
             Initialize(config);
 
         } catch (JsonSyntaxException ex) {
-            ex.printStackTrace();
-            return false;
+          //ex.printStackTrace();
+          System.err.println("Malformed json!");
+          return false;
         }
         return true;
     }

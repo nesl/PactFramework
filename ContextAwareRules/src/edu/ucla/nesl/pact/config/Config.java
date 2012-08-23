@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Config {
-    private List<Rule> rules;
 
-    public Config() {
-        rules = new ArrayList<Rule>();
-    }
+  private List<Rule> rules;
 
-    public void addRule(Rule rule) {
-        rules.add(rule);
-    }
+  public Config() {
+    rules = new ArrayList<Rule>();
+  }
 
-    public List<Rule> getRules() {
-        return rules;
-    }
+  public void addRule(Rule rule) {
+    rules.add(rule);
+  }
+
+  public List<Rule> getRules() {
+    return rules;
+  }
 
 }
