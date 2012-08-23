@@ -1,8 +1,15 @@
 import junit.framework.TestCase;
 
+import org.easymock.EasyMock;
+
+import java.util.List;
+
+import edu.ucla.nesl.pact.IActionRunner;
+import edu.ucla.nesl.pact.IRulesParser;
 import edu.ucla.nesl.pact.RulesParser;
-import edu.ucla.nesl.pact.config.Config;
+import edu.ucla.nesl.pact.config.Action;
 import edu.ucla.nesl.pact.config.Rule;
+import edu.ucla.nesl.pact.config.RulesConfig;
 
 public class RulesParserTest extends TestCase {
 
@@ -17,31 +24,35 @@ public class RulesParserTest extends TestCase {
     super.tearDown();
   }
 
-  public void testRuleParser() {
-    Config config = new Config();
+  private RulesConfig getSimpleLocationPerturbConfig() {
+    RulesConfig rulesConfig = new RulesConfig();
 
-    Rule rule = new Rule("Rule1", "Testing Rule1");
-    rule.addContext(new String[]{"location.home", "location.los_angeles"});
-
+    Rule rule = new Rule("facebook_rule_one",
+                         "Perturb location delivered to facebook if in a semantic place.");
     rule.addPackage("com.facebook.katana");
-    rule.addAction("gps.perturb", "{\"MEAN\":20, \"VARIANCE\"=30}");
-    rule.addAction("acclerometer.suppress", "{}");
-    config.addRule(rule);
+    rule.addContext(new String[]{"location.home", "location.los_angeles"});
+    rule.addAction("gps.perturb", "{\"VARIANCE_METERS\": 100}");
+    rulesConfig.addRule(rule);
+    return rulesConfig;
+  }
 
-    RulesParser parser = new RulesParser();
-    parser.Initialize(config);
+  public void testRuleParserWithSequentialRule() {
+    final RulesConfig rulesConfig = getSimpleLocationPerturbConfig();
 
+    final List<Action> expectedActions = rulesConfig.getRules().get(0).getActions();
+    IActionRunner mockRunner = EasyMock.createMock(IActionRunner.class);
+    mockRunner.runAction(EasyMock.eq(expectedActions));
+    mockRunner.runAction(EasyMock.eq(expectedActions));
+    EasyMock.replay(mockRunner);
+
+    IRulesParser parser = new RulesParser();
+    parser.Initialize(rulesConfig, mockRunner);
     parser.onContextReceived("location", RulesParser.ENTER_EVENT, "home");
-    parser.dump();
     parser.onContextReceived("location", RulesParser.ENTER_EVENT, "los_angeles");
-    parser.dump();
     parser.onContextReceived("location", RulesParser.EXIT_EVENT, "los_angeles");
-    parser.dump();
     parser.onContextReceived("location", RulesParser.EXIT_EVENT, "los_angeles");
-    parser.dump();
     parser.onContextReceived("location", RulesParser.ENTER_EVENT, "los_angeles");
-    parser.dump();
 
-    // TODO: Assert a bunch of stuff.
+    EasyMock.verify(mockRunner);
   }
 }

@@ -183,8 +183,8 @@ public class MainPipeline extends ConfiguredPipeline {
   public void updateConfig(String jsonString) {
 
     RulesParser parser = new RulesParser();
-    parser.loadConfigFromFunfConfigJson(jsonString);
-    final String funfString = parser.getFunfConfigString();
+    parser.loadRulesConfigFromFunfJson(jsonString);
+    final String funfString = parser.getFunfConfigJson();
     super.updateConfig(funfString);
   }
 }

@@ -3,11 +3,11 @@ package edu.ucla.nesl.pact.config;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Config {
+public class RulesConfig {
 
   private List<Rule> rules;
 
-  public Config() {
+  public RulesConfig() {
     rules = new ArrayList<Rule>();
   }
 
