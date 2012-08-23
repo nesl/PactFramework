@@ -1,4 +1,2 @@
 PactFramework
 =============
-
-Mobile Privacy Code
