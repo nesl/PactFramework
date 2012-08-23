@@ -28,7 +28,6 @@ public class UploadActivity extends Activity {
         Intent i = new Intent(this, MainPipeline.class);
         i.setAction(MainPipeline.ACTION_UPDATE_CONFIG);
         String jsonString = MainPipeline.getStringFromAsset(this, "default_config.json");
-        //AssetManager asset = getAssets().open()
         i.putExtra(MainPipeline.CONFIG, jsonString);
         startService(i);
     }

@@ -77,4 +77,15 @@ public class Rule {
         contexts.add(clause);
     }
 
+    public void addContext(String[] clause_arr)
+    {
+        List<String> clause = new ArrayList<String>();
+
+        for (String c : clause_arr) {
+            clause.add(c);
+        }
+
+        contexts.add(clause);
+    }
+
 }

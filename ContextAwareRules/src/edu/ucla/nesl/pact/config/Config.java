@@ -14,4 +14,8 @@ public class Config {
         rules.add(rule);
     }
 
+    public List<Rule> getRules() {
+        return rules;
+    }
+
 }

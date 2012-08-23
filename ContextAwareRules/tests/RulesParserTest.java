@@ -37,7 +37,7 @@ public class RulesParserTest extends TestCase {
         }
         return null;
     }
-
+    /*
     public void testMalformedJson() {
         RulesParser ruleParser = new RulesParser();
         String jsonString = getStringFromTestJsonFile("default_config.json");
@@ -54,12 +54,14 @@ public class RulesParserTest extends TestCase {
 
         assertTrue(ruleParser.loadConfigFromFunfConfigJson(jsonString));
     }
+    */
 
     public void testRuleParser() {
         Config config = new Config();
 
         Rule rule = new Rule("Rule1", "Testing Rule1");
-        rule.addContext("location.home");
+        rule.addContext(new String[] {"location.home", "location.los_angeles"});
+
         rule.addPackage("com.facebook.katana");
         rule.addAction("gps.perturb", "{\"MEAN\":20, \"VARIANCE\"=30}");
         rule.addAction("acclerometer.suppress", "{}");
@@ -68,7 +70,17 @@ public class RulesParserTest extends TestCase {
         RulesParser parser = new RulesParser();
         parser.Initialize(config);
 
-        // TODO: Assert a bunch of stuff.
+        parser.onContextReceived("location", RulesParser.ENTER_EVENT, "home");
+        parser.dump();
+        parser.onContextReceived("location", RulesParser.ENTER_EVENT, "los_angeles");
+        parser.dump();
+        parser.onContextReceived("location", RulesParser.EXIT_EVENT, "los_angeles");
+        parser.dump();
+        parser.onContextReceived("location", RulesParser.EXIT_EVENT, "los_angeles");
+        parser.dump();
+        parser.onContextReceived("location", RulesParser.ENTER_EVENT, "los_angeles");
+        parser.dump();
 
+        // TODO: Assert a bunch of stuff.
     }
 }
