@@ -1,4 +1,4 @@
-package edu.ucla.nesl.pact;
+package edu.ucla.nesl.funf;
 
 import android.content.res.AssetManager;
 import android.location.Location;
@@ -17,7 +17,7 @@ import edu.mit.media.funf.Utils;
 import edu.mit.media.funf.probe.Probe;
 import edu.mit.media.funf.probe.builtin.ProbeKeys.LocationKeys;
 
-public class InterestingLocationProbe extends Probe implements LocationKeys {
+public class NearbyPlacesProbe extends Probe implements LocationKeys {
 
   public static final String PLACES = "PLACES";
 
@@ -32,7 +32,7 @@ public class InterestingLocationProbe extends Probe implements LocationKeys {
   private ProbeLocationListener listener;
   private ProbeLocationListener passiveListener;
   private Location latestLocation;
-  private POIDatabase mDB;
+  private PlacesManager mDB;
 
   @Override
   public Parameter[] getAvailableParameters() {
@@ -87,7 +87,7 @@ public class InterestingLocationProbe extends Probe implements LocationKeys {
     }
 
     AssetManager assetManager = getAssets();
-    mDB = new POIDatabase();
+    mDB = new PlacesManager();
     try {
       InputStreamReader reader =
           new InputStreamReader(assetManager.open("los-angeles.amenities.json"));
