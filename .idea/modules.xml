@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ContextAwareRules/ContextAwareRules.iml" filepath="$PROJECT_DIR$/ContextAwareRules/ContextAwareRules.iml" />
       <module fileurl="file://$PROJECT_DIR$/FunfLibrary/FunfLibrary.iml" filepath="$PROJECT_DIR$/FunfLibrary/FunfLibrary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/InterestingLocationProbe/InterestingLocationProbe.iml" filepath="$PROJECT_DIR$/InterestingLocationProbe/InterestingLocationProbe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NearbyPlacesProbe/NearbyPlacesProbe.iml" filepath="$PROJECT_DIR$/NearbyPlacesProbe/NearbyPlacesProbe.iml" />
     </modules>
   </component>
 </project>
