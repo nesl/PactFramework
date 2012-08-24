@@ -48,7 +48,7 @@
                 android:name="edu.mit.media.funf.probe.builtin.AccelerometerFeaturesProbe"></service>
 
         <!-- Pact Probes -->
-        <service android:name="edu.ucla.nesl.pact.InterestingLocationProbe"></service>
+        <service android:name="edu.ucla.nesl.funf.NearbyPlacesProbe"></service>
 
         <!-- Framework services -->
         <service android:name="edu.ucla.nesl.funf.MainPipeline" android:exported="true">

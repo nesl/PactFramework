@@ -1,4 +1,4 @@
-package edu.ucla.nesl.pact;
+package edu.ucla.nesl.funf;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-public class POIDatabase {
+public class PlacesManager {
 
-  private static final String TAG = "POIDatabase";
+  private static final String TAG = "PlacesManager";
   private QuadTree mIndex;
   private boolean mLoaded = false;
 
