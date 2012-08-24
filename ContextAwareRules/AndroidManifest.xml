@@ -51,18 +51,18 @@
         <service android:name="edu.ucla.nesl.pact.InterestingLocationProbe"></service>
 
         <!-- Framework services -->
-        <service android:name=".MainPipeline" android:exported="true">
+        <service android:name="edu.ucla.nesl.funf.MainPipeline" android:exported="true">
             <intent-filter>
-                <action android:name="edu.ucla.nesl.pact.MainPipeline"/>
+                <action android:name="edu.ucla.nesl.funf.MainPipeline"/>
             </intent-filter>
         </service>
 
-        <service android:name=".PrivacyService"/>
+        <service android:name=".PactService"/>
 
         <service android:name="edu.mit.media.funf.storage.NameValueDatabaseService"></service>
         <service android:name="edu.mit.media.funf.storage.HttpUploadService"></service>
 
-        <receiver android:name=".LauncherReceiver" android:enabled="true">
+        <receiver android:name="edu.ucla.nesl.funf.LauncherReceiver" android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_CHANGED"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>

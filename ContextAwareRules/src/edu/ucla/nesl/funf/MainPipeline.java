@@ -1,4 +1,10 @@
-package edu.ucla.nesl.pact;
+package edu.ucla.nesl.funf;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +25,12 @@ import edu.mit.media.funf.configured.ConfiguredPipeline;
 import edu.mit.media.funf.configured.FunfConfig;
 import edu.mit.media.funf.probe.Probe;
 import edu.mit.media.funf.storage.BundleSerializer;
+import edu.ucla.nesl.pact.IPactEngine;
+import edu.ucla.nesl.pact.IRuleScheduler;
+import edu.ucla.nesl.pact.PactEngine;
+import edu.ucla.nesl.pact.PactService;
+import edu.ucla.nesl.pact.RuleScheduler;
+import edu.ucla.nesl.pact.config.RulesConfig;
 
 import static edu.mit.media.funf.AsyncSharedPrefs.async;
 
@@ -31,6 +43,17 @@ public class MainPipeline extends ConfiguredPipeline {
 
   public static final String ACTION_RUN_ONCE = "RUN_ONCE";
   public static final String RUN_ONCE_PROBE_NAME = "PROBE_NAME";
+
+
+  IPactEngine mPactEngine = null;
+
+  @Override
+  public void reload() {
+    super.reload();
+    final Context context = this;
+    IRuleScheduler scheduler = new RuleScheduler(context);
+    mPactEngine = new PactEngine(scheduler);
+  }
 
   @Override
   protected void onHandleIntent(Intent intent) {
@@ -78,7 +101,7 @@ public class MainPipeline extends ConfiguredPipeline {
 
   private void sendDataToPrivacyService(Bundle data) {
     Intent i = new Intent(this, getPrivacyServiceClass());
-    i.setAction(PrivacyService.ACTION_REPORT_DATA);
+    i.setAction(PactService.ACTION_REPORT_DATA);
     i.putExtras(data);
     startService(i);
   }
@@ -176,15 +199,28 @@ public class MainPipeline extends ConfiguredPipeline {
   }
 
   public Class<?> getPrivacyServiceClass() {
-    return PrivacyService.class;
+    return PactService.class;
   }
 
   @Override
   public void updateConfig(String jsonString) {
 
-    RulesParser parser = new RulesParser();
-    parser.loadRulesConfigFromFunfJson(jsonString);
-    final String funfString = parser.getFunfConfigJson();
-    super.updateConfig(funfString);
+    try {
+      JsonParser parser = new JsonParser();
+      JsonElement rootElement = parser.parse(jsonString);
+      JsonObject obj = rootElement.getAsJsonObject();
+      String funfJsonString = obj.getAsJsonObject("funf").toString();
+
+      Gson gson = new Gson();
+      final RulesConfig rulesConfig =
+          gson.fromJson(obj.get("pact"), RulesConfig.class);
+
+      mPactEngine.loadFromConfig(rulesConfig);
+      super.updateConfig(funfJsonString);
+
+    } catch (JsonSyntaxException ex) {
+      Log.e(TAG, "updateConfig: Malform JSON!");
+    }
+
   }
 }

@@ -1,11 +1,5 @@
 package edu.ucla.nesl.pact;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,9 +7,12 @@ import java.util.List;
 import edu.ucla.nesl.pact.config.Rule;
 import edu.ucla.nesl.pact.config.RulesConfig;
 
-public class RulesParser implements IRulesParser {
+/**
+ * @author Kasturi Rangan Raghavan (kastur@gmail.com)
+ */
+public class PactEngine implements IPactEngine {
 
-  private String mFunfString;
+  private IRuleScheduler mRuleScheduler;
 
   // probeContext (atomic contexts) -> set of rules.
   private HashMap<String, HashSet<Rule>> mContextRules;
@@ -26,47 +23,18 @@ public class RulesParser implements IRulesParser {
   // Flattened representation of world state, but probeContext (atomic contexts).
   private HashSet<String> mProbeContexts;
 
-
-  IActionRunner mActionRunner;
-
   public static final int ENTER_EVENT = 1;
   public static final int EXIT_EVENT = 0;
 
-  public RulesParser() {
+  public PactEngine(IRuleScheduler ruleScheduler) {
+    mRuleScheduler = ruleScheduler;
+  }
+
+  @Override
+  public void loadFromConfig(RulesConfig rulesConfig) {
     mProbeContexts = new HashSet<String>();
     mProbeContextsByProbeName = new HashMap<String, HashSet<String>>();
     mContextRules = new HashMap<String, HashSet<Rule>>();
-  }
-
-  public boolean loadRulesConfigFromFunfJson(String jsonString) {
-    JsonParser parser = new JsonParser();
-
-    try {
-      JsonElement rootElement = parser.parse(jsonString);
-      JsonObject obj = rootElement.getAsJsonObject();
-      mFunfString = obj.getAsJsonObject("funf").toString();
-
-      Gson gson = new Gson();
-      final RulesConfig rulesConfig =
-          gson.fromJson(obj.get("pact"), RulesConfig.class);
-
-      // TOOD: Need to initialize with a non-null ActionRunner!
-      Initialize(rulesConfig, null);
-
-    } catch (JsonSyntaxException ex) {
-      //ex.printStackTrace();
-      System.err.println("Malformed json!");
-      return false;
-    }
-    return true;
-  }
-
-  public String getFunfConfigJson() {
-    return mFunfString;
-  }
-
-  public void Initialize(RulesConfig rulesConfig, IActionRunner actionRunner) {
-    mActionRunner = actionRunner;
     for (Rule rule : rulesConfig.getRules()) {
       for (List<String> clause : rule.getContexts()) {
         for (String probeContext : clause) {
@@ -82,32 +50,37 @@ public class RulesParser implements IRulesParser {
     }
   }
 
-  // Context report is NOT a probeContext.
-  // For example: what we get is like:
-  //  onContextReceived("ACTIVITY", ENTER_EVENT, "running")
-  public void onContextReceived(String probeName, int eventType, String context) {
-    final String probeContext = probeName + "." + context;
+
+  /**
+   * Process data from a probe that reports changes its state.
+   *
+   * @param eventType ENTER_EVENT or EXIT_EVENT.
+   */
+  @Override
+  public void onProbeData(String probeName, int eventType, String state) {
+    final String probeState = probeName + "." + state;
     checkInit(probeName);
     switch (eventType) {
       case ENTER_EVENT:
-        mProbeContextsByProbeName.get(probeName).add(probeContext);
-        mProbeContexts.add(probeContext);
+        mProbeContextsByProbeName.get(probeName).add(probeState);
+        mProbeContexts.add(probeState);
         break;
       case EXIT_EVENT:
-        mProbeContextsByProbeName.get(probeName).remove(probeContext);
-        mProbeContexts.remove(probeContext);
+        mProbeContextsByProbeName.get(probeName).remove(probeState);
+        mProbeContexts.remove(probeState);
         break;
     }
 
     if (eventType == ENTER_EVENT) {
-      tryExecuteRuleThatMentionsContext(probeContext);
+      doExecuteRulesThatMentionProbeState(probeState);
     }
   }
 
-  // Context report is NOT a probeContext.
-  // For example: what we get is like:
-  //  onContextReceived("ACTIVITY", {"running", "moving"})
-  public void onContextReceived(String probeName, HashSet<String> contexts) {
+  /**
+   * Process data from a probe that reports it's full set of state.
+   */
+  @Override
+  public void onProbeData(String probeName, HashSet<String> states) {
     checkInit(probeName);
     // First remove the previous state from flattened set mProbeContexts
     HashSet<String> previousProbeContexts = mProbeContextsByProbeName.get(probeName);
@@ -116,16 +89,16 @@ public class RulesParser implements IRulesParser {
     }
 
     // Prefix everything with probeName to make it a probeContext.
-    HashSet<String> probeContexts = new HashSet<String>();
-    for (String context : contexts) {
-      probeContexts.add(probeName + "." + context);
+    HashSet<String> probeStates = new HashSet<String>();
+    for (String context : states) {
+      probeStates.add(probeName + "." + context);
     }
 
     // Put the probeContexts into the two state objects we maintain.
-    mProbeContextsByProbeName.put(probeName, probeContexts);
-    mProbeContexts.addAll(probeContexts);
+    mProbeContextsByProbeName.put(probeName, probeStates);
+    mProbeContexts.addAll(probeStates);
 
-    tryExecuteRuleThatMentionsContext(probeContexts);
+    doExecuteRulesThatMentionProbeState(probeStates);
 
   }
 
@@ -135,20 +108,20 @@ public class RulesParser implements IRulesParser {
     }
   }
 
-  private void tryExecuteRuleThatMentionsContext(String probeContext) {
+  protected void doExecuteRulesThatMentionProbeState(String probeContext) {
     HashSet<Rule> candidateMatches = mContextRules.get(probeContext);
-    tryToExecuteRules(candidateMatches);
+    doExecuteRuleIfSatisfied(candidateMatches);
   }
 
-  private void tryExecuteRuleThatMentionsContext(HashSet<String> probeContexts) {
+  protected void doExecuteRulesThatMentionProbeState(HashSet<String> probeContexts) {
     HashSet<Rule> candidateMatches = new HashSet<Rule>();
     for (String probeContext : probeContexts) {
       candidateMatches.addAll(mContextRules.get(probeContext));
     }
-    tryToExecuteRules(candidateMatches);
+    doExecuteRuleIfSatisfied(candidateMatches);
   }
 
-  private void tryToExecuteRules(HashSet<Rule> candidateMatches) {
+  protected void doExecuteRuleIfSatisfied(HashSet<Rule> candidateMatches) {
     for (Rule candidateRule : candidateMatches) {
       for (List<String> clause : candidateRule.getContexts()) {
         // TODO: Push this inside the initialization of the rule.
@@ -164,8 +137,8 @@ public class RulesParser implements IRulesParser {
     }
   }
 
-  private void doExecuteRule(Rule rule) {
-    mActionRunner.runAction(rule.getActions());
+  public void doExecuteRule(Rule rule) {
+    mRuleScheduler.scheduleRule(rule);
   }
 
   public void dump() {
