@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import edu.mit.media.funf.Utils;
@@ -134,31 +135,30 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
   @Override
   public void sendProbeData() {
     if (latestLocation != null) {
-      final String[] places = getInterestingPlaces(latestLocation);
+      final ArrayList<String> places = getInterestingPlaces(latestLocation);
       Bundle data = new Bundle();
       data.putParcelable(LOCATION, latestLocation);
-      data.putStringArray(PLACES, places);
+      data.putStringArrayList(PLACES, places);
       sendProbeData(Utils.millisToSeconds(latestLocation.getTime()), data);
     }
   }
 
-  private String[] getInterestingPlaces(Location location) {
+  private ArrayList<String> getInterestingPlaces(Location location) {
     float lat = (float) location.getLatitude();
     float lon = (float) location.getLongitude();
     float accuracy_meters = location.getAccuracy();
-    HashSet<String> set_of_places = mDB.query(lat, lon, accuracy_meters);
+    HashSet<String> placesSet = mDB.query(lat, lon, accuracy_meters);
 
-    if (set_of_places.size() > 0) {
+    if (placesSet.size() > 0) {
       Log.d(TAG,
-            "----FOUND: places" + set_of_places.size() + " within " + accuracy_meters + " meters.");
-      for (String s : set_of_places) {
+            "----FOUND: places" + placesSet.size() + " within " + accuracy_meters + " meters.");
+      for (String s : placesSet) {
         Log.v(TAG, "place >> " + s);
       }
     }
 
-    String[] places = new String[set_of_places.size()];
-    set_of_places.toArray(places);
-    return places;
+    ArrayList<String> placesList = new ArrayList<String>(placesSet);
+    return placesList;
   }
 
   private class ProbeLocationListener implements LocationListener {
