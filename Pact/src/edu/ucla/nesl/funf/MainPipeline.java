@@ -1,6 +1,5 @@
 package edu.ucla.nesl.funf;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -30,7 +29,6 @@ import edu.ucla.nesl.pact.IRuleScheduler;
 import edu.ucla.nesl.pact.PactEngine;
 import edu.ucla.nesl.pact.PactService;
 import edu.ucla.nesl.pact.RuleScheduler;
-import edu.ucla.nesl.pact.config.RulesConfig;
 
 import static edu.mit.media.funf.AsyncSharedPrefs.async;
 
@@ -211,11 +209,6 @@ public class MainPipeline extends ConfiguredPipeline {
       JsonObject obj = rootElement.getAsJsonObject();
       String funfJsonString = obj.getAsJsonObject("funf").toString();
 
-      Gson gson = new Gson();
-      final RulesConfig rulesConfig =
-          gson.fromJson(obj.get("pact"), RulesConfig.class);
-
-      mPactEngine.loadFromConfig(rulesConfig);
       super.updateConfig(funfJsonString);
 
     } catch (JsonSyntaxException ex) {

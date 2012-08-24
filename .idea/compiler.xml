@@ -3,9 +3,10 @@
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
     <excludeFromCompile>
-      <directory url="file://$PROJECT_DIR$/ContextAwareRules/gen" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/Pact/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/FunfLibrary/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/NearbyPlacesProbe/gen" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/PactFrameworkTests/gen" includeSubdirectories="true" />
     </excludeFromCompile>
     <resourceExtensions />
     <wildcardResourcePatterns>
