@@ -99,7 +99,7 @@ public class MainPipeline extends ConfiguredPipeline {
 
   private void sendDataToPrivacyService(Bundle data) {
     Intent i = new Intent(this, getPrivacyServiceClass());
-    i.setAction(PactService.ACTION_REPORT_DATA);
+    i.setAction(PactService.ACTION_PROBE_DATA);
     i.putExtras(data);
     startService(i);
   }

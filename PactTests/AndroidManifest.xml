@@ -16,6 +16,6 @@
     "adb shell am instrument -w edu.ucla.nesl.pact.tests/android.test.InstrumentationTestRunner"
     -->
     <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="edu.ucla.nesl.pact"
-                     android:label="Tests for edu.ucla.nesl.pact"/>
+                     android:targetPackage="edu.ucla.nesl"
+                     android:label="Tests for edu.ucla.nesl"/>
 </manifest>
