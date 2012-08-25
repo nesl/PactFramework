@@ -43,7 +43,7 @@
     <orderEntry type="module" module-name="Pact" scope="PROVIDED" />
     <orderEntry type="module" module-name="FunfLibrary" />
     <orderEntry type="module" module-name="NearbyPlacesProbe" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/gson-1.7.1.jar!/" />
