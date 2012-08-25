@@ -1,7 +1,6 @@
 package edu.ucla.nesl.funf;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
@@ -25,10 +24,7 @@ import edu.mit.media.funf.configured.FunfConfig;
 import edu.mit.media.funf.probe.Probe;
 import edu.mit.media.funf.storage.BundleSerializer;
 import edu.ucla.nesl.pact.IPactEngine;
-import edu.ucla.nesl.pact.IRuleScheduler;
-import edu.ucla.nesl.pact.PactEngine;
 import edu.ucla.nesl.pact.PactService;
-import edu.ucla.nesl.pact.RuleScheduler;
 
 import static edu.mit.media.funf.AsyncSharedPrefs.async;
 
@@ -49,8 +45,6 @@ public class MainPipeline extends ConfiguredPipeline {
   public void reload() {
     super.reload();
     final Context context = this;
-    IRuleScheduler scheduler = new RuleScheduler(context);
-    mPactEngine = new PactEngine(scheduler);
   }
 
   @Override
@@ -58,24 +52,9 @@ public class MainPipeline extends ConfiguredPipeline {
     if (ACTION_RUN_ONCE.equals(intent.getAction())) {
       String probeName = intent.getStringExtra(RUN_ONCE_PROBE_NAME);
       runProbeOnceNow(probeName);
-    } else if (intent.getStringExtra("EVENT_NAME") != null) {
-      handleInstrumentationIntent(intent);
     } else {
       super.onHandleIntent(intent);
     }
-  }
-
-  private void handleInstrumentationIntent(Intent intent) {
-    final String event = intent.getStringExtra("EVENT_NAME");
-    final String pkg = intent.getStringExtra("PKG_NAME");
-    final String cls = intent.getStringExtra("CLS_NAME");
-    Bundle data = new Bundle();
-    data.putString(Probe.PROBE, "Instrumentation");
-    data.putLong(Probe.TIMESTAMP, System.currentTimeMillis());
-    data.putString("event", event);
-    data.putString("pkg", pkg);
-    data.putString("cls", cls);
-    onDataReceived(data);
   }
 
   @Override
@@ -200,20 +179,22 @@ public class MainPipeline extends ConfiguredPipeline {
     return PactService.class;
   }
 
-  @Override
-  public void updateConfig(String jsonString) {
 
+  @Override
+  protected void onConfigChange(String json) {
+    super.onConfigChange(json);
     try {
       JsonParser parser = new JsonParser();
-      JsonElement rootElement = parser.parse(jsonString);
-      JsonObject obj = rootElement.getAsJsonObject();
-      String funfJsonString = obj.getAsJsonObject("funf").toString();
+      JsonElement rootElement = parser.parse(json);
+      String pactJson = rootElement.getAsJsonObject().getAsJsonObject("pactConfig").toString();
 
-      super.updateConfig(funfJsonString);
+      Intent intent = new Intent(this, PactService.class);
+      intent.setAction(PactService.ACTION_CONFIG_UPDATE);
+      intent.putExtra(PactService.JSON_CONFIG, pactJson);
+
 
     } catch (JsonSyntaxException ex) {
       Log.e(TAG, "updateConfig: Malform JSON!");
     }
-
   }
 }

@@ -53,19 +53,13 @@
         <!-- Framework services -->
         <service android:name=".funf.MainPipeline"/>
 
-        <service android:name=".pact.PactService"
-                 android:exported="true"
-                 android:permission="false">
-            <intent-filter>
-                <action android:name="edu.ucla.nesl.pact.ACTION_PROBE_DATA"/>
-                <action android:name="edu.ucla.nesl.pact.ACTION_CONFIG_UPDATE"/>
-            </intent-filter>
-        </service>
+        <service android:name=".pact.PactService"/>
 
         <receiver android:name=".funf.LauncherReceiver" android:enabled="true">
             <intent-filter>
                 <action android:name="edu.ucla.nesl.funf.ACTION_RESET"/>
-                <action android:name="edu.ucla.nels.funf.ACTION_PLACE_DEBUG"/>
+                <action android:name="edu.ucla.nesl.funf.ACTION_PLACE_DEBUG"/>
+                <action android:name="edu.ucla.nesl.funf.ACTION_UPDATE_CONFIG"/>
 
                 <action android:name="android.intent.action.BATTERY_CHANGED"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>

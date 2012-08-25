@@ -13,6 +13,7 @@ public class LauncherReceiver extends BroadcastReceiver {
 
   private static final String prefix = "edu.ucla.nesl.funf.";
   public static final String ACTION_RESET = prefix + "ACTION_RESET";
+  public static final String ACTION_UPDATE_CONFIG = prefix + "ACTION_UPDATE_CONFIG";
   public static final String ACTION_PLACE_DEBUG = prefix + "ACTION_PLACE_DEBUG";
 
   public static void startService(Context context, Class<? extends Service> serviceClass) {
@@ -22,11 +23,15 @@ public class LauncherReceiver extends BroadcastReceiver {
 
 
   @Override
-  public void onReceive(Context context, Intent intent) {
+  public void onReceive(Context context, final Intent intent) {
     final String action = intent.getAction();
     if (action != null) {
       if (action.equals(ACTION_RESET)) {
         startService(context, MainPipeline.class);
+      } else if (action.equals(ACTION_UPDATE_CONFIG)) {
+        Intent startIntent = new Intent(context.getApplicationContext(), MainPipeline.class);
+        startIntent.setAction(MainPipeline.ACTION_UPDATE_CONFIG);
+        context.getApplicationContext().startService(startIntent);
       } else if (action.equals(ACTION_PLACE_DEBUG)) {
         Bundle data = intent.getExtras();
         if (data == null) {
