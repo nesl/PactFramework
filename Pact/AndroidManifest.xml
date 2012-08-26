@@ -52,7 +52,6 @@
 
         <!-- Framework services -->
         <service android:name=".funf.MainPipeline"/>
-
         <service android:name=".pact.PactService"/>
 
         <receiver android:name=".funf.LauncherReceiver" android:enabled="true">
@@ -68,6 +67,13 @@
                 <action android:name="android.intent.action.USER_PRESENT"/>
             </intent-filter>
         </receiver>
+
+        <activity android:name=".pact.PactSettingsActivity" android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
     </application>
 

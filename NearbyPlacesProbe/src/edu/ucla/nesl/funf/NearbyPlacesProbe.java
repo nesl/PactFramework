@@ -1,5 +1,6 @@
 package edu.ucla.nesl.funf;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -34,6 +35,12 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
   private ProbeLocationListener passiveListener;
   private Location latestLocation;
   private PlacesManager mDB;
+
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    super.onHandleIntent(intent);
+
+  }
 
   @Override
   public Parameter[] getAvailableParameters() {
@@ -117,7 +124,8 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
   @Override
   protected void onDisable() {
     mLocationManager.removeUpdates(passiveListener);
-    mDB.clear();
+
+    //mDB.clear();
   }
 
   public void onRun(Bundle params) {
@@ -135,7 +143,7 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
   @Override
   public void sendProbeData() {
     if (latestLocation != null) {
-      final ArrayList<String> places = getInterestingPlaces(latestLocation);
+      final ArrayList<String> places = getNearbyPlaces(latestLocation);
       Bundle data = new Bundle();
       data.putParcelable(LOCATION, latestLocation);
       data.putStringArrayList(PLACES, places);
@@ -143,11 +151,11 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
     }
   }
 
-  private ArrayList<String> getInterestingPlaces(Location location) {
+  private ArrayList<String> getNearbyPlaces(Location location) {
     float lat = (float) location.getLatitude();
     float lon = (float) location.getLongitude();
     float accuracy_meters = location.getAccuracy();
-    HashSet<String> placesSet = mDB.query(lat, lon, accuracy_meters);
+    HashSet<String> placesSet = mDB.getNearbyPlaces(lat, lon, accuracy_meters);
 
     if (placesSet.size() > 0) {
       Log.d(TAG,

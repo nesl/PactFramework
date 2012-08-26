@@ -21,19 +21,20 @@
  */
 package edu.mit.media.funf.configured;
 
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Bundle;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Bundle;
 import edu.mit.media.funf.EqualsUtil;
 import edu.mit.media.funf.Utils;
 import edu.mit.media.funf.probe.ProbeExceptions.UnstorableTypeException;
@@ -45,7 +46,8 @@ import edu.mit.media.funf.probe.ProbeExceptions.UnstorableTypeException;
  *
  */
 public class FunfConfig implements OnSharedPreferenceChangeListener {
-	public static final String 
+	public static final String
+                PACT_CONFIG_KEY = "pactConfig",
 		NAME_KEY = "name",
 		VERSION_KEY = "version",
 		CONFIG_UPDATE_URL_KEY = "configUpdateUrl",
@@ -63,7 +65,8 @@ public class FunfConfig implements OnSharedPreferenceChangeListener {
 	public static final boolean
 		DEFAULT_DATA_UPLOAD_ON_WIFI_ONLY = false;
 	public static final String DEFAULT_DATA_REQUESTS = "{}"; // No requests
-	
+      public static final String DEFAULT_PACT_CONFIG_KEY = "{\"rules\": {}}"; // No rules
+
 	
 	private final SharedPreferences prefs;
 	
@@ -130,6 +133,10 @@ public class FunfConfig implements OnSharedPreferenceChangeListener {
 	public long getDataArchivePeriod() {
 		return prefs.getLong(DATA_ARCHIVE_PERIOD_KEY, DEFAULT_DATA_ARCHIVE_PERIOD);
 	}
+
+        public String getPactConfigJson() {
+          return prefs.getString(PACT_CONFIG_KEY, DEFAULT_PACT_CONFIG_KEY);
+        }
 
 	private Map<String, Bundle[]> dataRequests; // cache
 	/**
@@ -282,6 +289,22 @@ public class FunfConfig implements OnSharedPreferenceChangeListener {
 				editor.putString(key, value);
 			}
 		}
+
+                private void setJsonString(JSONObject jsonObject, String key) {
+                  String value = null;
+                  try {
+                    value = jsonObject.getJSONObject(key).toString(2);
+                  } catch (JSONException ex) {
+                    ex.printStackTrace();
+                  }
+
+                  if (value == null) {
+                    editor.remove(key);
+                  } else {
+                    editor.putString(key, value);
+                  }
+                }
+
 		
 		private void setBoolean(JSONObject jsonObject, String key) {
 			if (jsonObject.has(key)) {
@@ -312,6 +335,7 @@ public class FunfConfig implements OnSharedPreferenceChangeListener {
 			setBoolean(jsonObject, DATA_UPLOAD_ON_WIFI_ONLY_KEY);
 			setPositiveLong(jsonObject, DATA_UPLOAD_PERIOD_KEY);
 			setPositiveLong(jsonObject, DATA_ARCHIVE_PERIOD_KEY);
+                        setJsonString(jsonObject, PACT_CONFIG_KEY);
 			
 			// Add new probe requests
 			JSONObject requestsJsonObject = jsonObject.getJSONObject(DATA_REQUESTS_KEY);
@@ -472,6 +496,8 @@ public class FunfConfig implements OnSharedPreferenceChangeListener {
 		for (Map.Entry<String, ?> entry : prefs.getAll().entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();
+                        if (key.equals(PACT_CONFIG_KEY))
+                          continue;
 			if (isDataRequestKey(key)) {
 				if (value != null) {
 					String probeName = keyToProbename(key);
@@ -481,6 +507,9 @@ public class FunfConfig implements OnSharedPreferenceChangeListener {
 				jsonObject.put(key, value);
 			}
 		}
+                final String pactConfigJson = getPactConfigJson();
+                JSONObject pactConfigObj = new JSONObject(pactConfigJson);
+                jsonObject.put(PACT_CONFIG_KEY, pactConfigObj);
 		return jsonObject;
 	}
 

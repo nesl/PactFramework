@@ -123,13 +123,16 @@ public class PactEngine implements IPactEngine {
 
   protected void doExecuteRulesThatMentionProbeState(String probeContext) {
     HashSet<Rule> candidateMatches = mContextRules.get(probeContext);
-    doExecuteRuleIfSatisfied(candidateMatches);
+    if (candidateMatches != null)
+      doExecuteRuleIfSatisfied(candidateMatches);
   }
 
   protected void doExecuteRulesThatMentionProbeState(HashSet<String> probeContexts) {
     HashSet<Rule> candidateMatches = new HashSet<Rule>();
     for (String probeContext : probeContexts) {
-      candidateMatches.addAll(mContextRules.get(probeContext));
+      HashSet<Rule> matches = mContextRules.get(probeContext);
+      if (matches != null)
+        candidateMatches.addAll(matches);
     }
     doExecuteRuleIfSatisfied(candidateMatches);
   }

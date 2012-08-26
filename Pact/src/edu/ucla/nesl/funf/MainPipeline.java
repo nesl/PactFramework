@@ -1,9 +1,5 @@
 package edu.ucla.nesl.funf;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +38,18 @@ public class MainPipeline extends ConfiguredPipeline {
   IPactEngine mPactEngine = null;
 
   @Override
+  public void onCreate() {
+    super.onCreate();
+    sendConfigToPactService(getConfig().getPactConfigJson());
+  }
+
+  @Override
+  protected void onConfigChange(String json) {
+    super.onConfigChange(json);
+    sendConfigToPactService(getConfig().getPactConfigJson());
+  }
+
+  @Override
   public void reload() {
     super.reload();
     final Context context = this;
@@ -73,15 +81,9 @@ public class MainPipeline extends ConfiguredPipeline {
   @Override
   public void onDataReceived(Bundle data) {
     super.onDataReceived(data);
-    sendDataToPrivacyService(data);
+    sendDataToPactService(data);
   }
 
-  private void sendDataToPrivacyService(Bundle data) {
-    Intent i = new Intent(this, getPrivacyServiceClass());
-    i.setAction(PactService.ACTION_PROBE_DATA);
-    i.putExtras(data);
-    startService(i);
-  }
 
   @Override
   public void onStatusReceived(Probe.Status status) {
@@ -111,7 +113,7 @@ public class MainPipeline extends ConfiguredPipeline {
 
   @Override
   public FunfConfig getConfig() {
-    return getMainConfig(this);
+    return getMainConfigAlwaysReload(this);
   }
 
   /**
@@ -131,6 +133,25 @@ public class MainPipeline extends ConfiguredPipeline {
       } catch (JSONException e) {
         Log.e(TAG, "Error parsing default config", e);
       }
+    }
+    return config;
+  }
+
+  static boolean mReloaded = false;
+  public static FunfConfig getMainConfigAlwaysReload(Context context) {
+    FunfConfig config = getConfig(context, MAIN_CONFIG);
+    if (!mReloaded) {
+      String jsonString = getStringFromAsset(context, "default_config.json");
+      if (jsonString == null) {
+        Log.e(TAG, "Error loading default config.  Using blank config.");
+        jsonString = "{}";
+      }
+      try {
+        config.edit().setAll(jsonString).commit();
+      } catch (JSONException e) {
+        Log.e(TAG, "Error parsing default config", e);
+      }
+      mReloaded = true;
     }
     return config;
   }
@@ -175,26 +196,21 @@ public class MainPipeline extends ConfiguredPipeline {
     startService(request);
   }
 
-  public Class<?> getPrivacyServiceClass() {
+  public Class<?> getPactServiceClass() {
     return PactService.class;
   }
 
+  protected void sendConfigToPactService(String json) {
+    Intent intent = new Intent(this, getPactServiceClass());
+    intent.setAction(PactService.ACTION_CONFIG_UPDATE);
+    intent.putExtra(PactService.JSON_CONFIG, json);
+    startService(intent);
+  }
 
-  @Override
-  protected void onConfigChange(String json) {
-    super.onConfigChange(json);
-    try {
-      JsonParser parser = new JsonParser();
-      JsonElement rootElement = parser.parse(json);
-      String pactJson = rootElement.getAsJsonObject().getAsJsonObject("pactConfig").toString();
-
-      Intent intent = new Intent(this, PactService.class);
-      intent.setAction(PactService.ACTION_CONFIG_UPDATE);
-      intent.putExtra(PactService.JSON_CONFIG, pactJson);
-
-
-    } catch (JsonSyntaxException ex) {
-      Log.e(TAG, "updateConfig: Malform JSON!");
-    }
+  protected void sendDataToPactService(Bundle data) {
+    Intent intent = new Intent(this, getPactServiceClass());
+    intent.setAction(PactService.ACTION_PROBE_DATA);
+    intent.putExtras(data);
+    startService(intent);
   }
 }
