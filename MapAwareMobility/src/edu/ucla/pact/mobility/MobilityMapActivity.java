@@ -28,20 +28,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Interactive map with shortest path route between start and end points.
+ *
+ * Calls the externally running GraphHopper routing service for the shortest path.
+ * Displays map markers for the route along the path.
+ *
+ * @author Kasturi Rangan Raghavan (kastur@gmail.com)
+ */
 public class MobilityMapActivity extends MapActivity {
 
   private static final String TAG = "MobilityMapActivity";
   private static final int MSG_ROUTE = 0;
+  private final static GeoPoint DEFAULT_START_POINT =
+      new GeoPoint(34069144, -118443199);  // Boelter Hall.
+  private final static GeoPoint DEFAULT_END_POINT =
+      new GeoPoint(34063666, -118451397);  // Weyburn terrace.
 
   private AtomicBoolean mConnected;
-
-  private ArrayOverlay mArrayOverlay;
-
   private MapView mMapView;
-
+  private ArrayOverlay mArrayOverlay;
   private Marker mStartMarker;
   private Marker mEndMarker;
-
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +59,6 @@ public class MobilityMapActivity extends MapActivity {
 
     mConnected = new AtomicBoolean(false);
     Intent intent = new Intent("edu.ucla.nesl.pact.LocationRouteService");
-    //intent.setClassName("de.jetsli", "edu.ucla.nesl.pact.LocationRouteService");
     bindService(intent, mServiceConnection, BIND_AUTO_CREATE | BIND_DEBUG_UNBIND);
 
     mMapView.setBuiltInZoomControls(true);
@@ -61,20 +68,12 @@ public class MobilityMapActivity extends MapActivity {
     mapOverlays.add(mArrayOverlay);
 
     Drawable startDrawable = this.getResources().getDrawable(R.drawable.dd_start);
-    mStartMarker = new Marker(startDrawable, getDefaultStartPoint(), "START", "");
+    mStartMarker = new Marker(startDrawable, DEFAULT_START_POINT, "START", "");
     mapOverlays.add(mStartMarker);
 
     Drawable endDrawable = this.getResources().getDrawable(R.drawable.dd_end);
-    mEndMarker = new Marker(endDrawable, getDefaultEndPoint(), "END", "");
+    mEndMarker = new Marker(endDrawable, DEFAULT_END_POINT, "END", "");
     mapOverlays.add(mEndMarker);
-  }
-
-  private GeoPoint getDefaultStartPoint() {
-    return new GeoPoint(34069144, -118443199);
-  }
-
-  private GeoPoint getDefaultEndPoint() {
-    return new GeoPoint(34063666, -118451397);
   }
 
   @Override
@@ -97,29 +96,18 @@ public class MobilityMapActivity extends MapActivity {
     }
   };
 
-  protected void sendRequestRouteMessage() {
-    // Boelter Hall.
-    double fromLat = 34.069144;
-    double fromLon = -118.443199;
-
-    // Weyburn Terrace (graduate housing).
-    double toLat = 34.063666;
-    double toLon = -118.451397;
-
-    sendRequestRouteMessage(fromLat, fromLon, toLat, toLon);
-  }
-
-  private void sendSelfUpdateRouteMessage() {
-    sendRequestRouteMessage(mStartMarker.getCenter().getLatitudeE6() / 1000000.0,
-                            mStartMarker.getCenter().getLongitudeE6() / 1000000.0,
-                            mEndMarker.getCenter().getLatitudeE6() / 1000000.0,
-                            mEndMarker.getCenter().getLongitudeE6() / 1000000.0);
+  private void sendRequestRouteMessage() {
+    sendRequestRouteMessage(mStartMarker.getCenter().getLatitudeE6() / 1e6,
+                            mStartMarker.getCenter().getLongitudeE6() / 1e6,
+                            mEndMarker.getCenter().getLatitudeE6() / 1e6,
+                            mEndMarker.getCenter().getLongitudeE6() / 1e6);
   }
 
   private void sendRequestRouteMessage(double fromLat, double fromLon, double toLat, double toLon) {
     if (!mConnected.get()) {
       Log.d(TAG, "Not yet connected to the LocationRouter service! Discarding command.");
     }
+
     Bundle data = new Bundle();
     data.putDouble("fromLat", fromLat);
     data.putDouble("fromLon", fromLon);
@@ -128,6 +116,7 @@ public class MobilityMapActivity extends MapActivity {
     Message msg = Message.obtain(null, MSG_ROUTE);
     msg.setData(data);
     msg.replyTo = mMessenger;
+
     try {
       mLocationRouter.send(msg);
     } catch (RemoteException ex) {
@@ -213,32 +202,39 @@ public class MobilityMapActivity extends MapActivity {
       final int touchY = (int) event.getY();
       boolean eventHandled = false;
 
-      if (mDragging && action == MotionEvent.ACTION_UP) {
-        mDragImage.setVisibility(View.GONE);
-        GeoPoint geopoint = mMapView.getProjection().fromPixels(touchX, touchY);
-        setPoint(geopoint);
-        showMarker();
-        mDragging = false;
-        sendSelfUpdateRouteMessage();
-        return true;
-      } else if (action == MotionEvent.ACTION_DOWN) {
-        Point point = new Point(0, 0);
-        mMapView.getProjection().toPixels(mItem.getPoint(), point);
-        if (hitTest(mItem, mDrawable, touchX - point.x, touchY - point.y)) {
+      switch (action) {
+        case MotionEvent.ACTION_UP:
+          if (!mDragging) {
+            break;
+          }
+          // Drag finished.
+          mDragging = false;
+          mDragImage.setVisibility(View.GONE);
+          GeoPoint geopoint = mMapView.getProjection().fromPixels(touchX, touchY);
+          setPoint(geopoint);
+          showMarker();
+          sendRequestRouteMessage(); // updates the route.
+          eventHandled = true;
+          break;
+        case MotionEvent.ACTION_DOWN:
+          Point point = new Point(0, 0);
+          mMapView.getProjection().toPixels(mItem.getPoint(), point);
+          if (!hitTest(mItem, mDrawable, touchX - point.x, touchY - point.y)) {
+            break;
+          }
           hideMarker();
           mDragging = true;
-        }
-
+        case MotionEvent.ACTION_MOVE:
+          if (!mDragging) {
+            break;
+          }
+          setDragImagePosition(touchX, touchY);
+          mDragImage.setVisibility(View.VISIBLE);
+          eventHandled = true;
+          break;
       }
 
-      if (mDragging) {
-        setDragImagePosition(touchX, touchY);
-        mDragImage.setVisibility(View.VISIBLE);
-        return true;
-      }
-
-      return super.onTouchEvent(event, mapView);
-
+      return eventHandled || super.onTouchEvent(event, mapView);
     }
 
     private void showMarker() {
