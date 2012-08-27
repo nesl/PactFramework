@@ -25,55 +25,59 @@ import de.jetsli.graph.storage.Graph;
  */
 public class PathWrapperRef {
 
-    public EdgeEntry edgeFrom;
-    public EdgeEntry edgeTo;
-    public double weight;
-    public boolean switchWrapper = false;
-    private Graph g;
+  public EdgeEntry edgeFrom;
+  public EdgeEntry edgeTo;
+  public double weight;
+  public boolean switchWrapper = false;
+  private Graph g;
 
-    public PathWrapperRef(Graph g) {
-        this.g = g;
+  public PathWrapperRef(Graph g) {
+    this.g = g;
+  }
+
+  /**
+   * Extracts path from two shortest-path-tree
+   */
+  public Path extract() {
+    if (edgeFrom == null || edgeTo == null) {
+      return null;
     }
 
-    /**
-     * Extracts path from two shortest-path-tree
-     */
-    public Path extract() {
-        if (edgeFrom == null || edgeTo == null)
-            return null;
-
-        if (edgeFrom.node != edgeTo.node)
-            throw new IllegalStateException("Locations of the 'to'- and 'from'-Edge has to be the same." + toString());
-
-        if (switchWrapper) {
-            EdgeEntry ee = edgeFrom;
-            edgeFrom = edgeTo;
-            edgeTo = ee;
-        }
-        
-        Path path = new Path();
-        EdgeEntry currEdge = edgeFrom;
-        while (currEdge.prevEntry != null) {
-            int tmpFrom = currEdge.node;
-            path.add(tmpFrom);
-            currEdge = currEdge.prevEntry;
-            path.updateProperties(g.getIncoming(tmpFrom), currEdge.node);
-        }
-        path.add(currEdge.node);
-        path.reverseOrder();
-
-        currEdge = edgeTo;
-        while (currEdge.prevEntry != null) {
-            int tmpTo = currEdge.node;
-            currEdge = currEdge.prevEntry;
-            path.add(currEdge.node);
-            path.updateProperties(g.getIncoming(currEdge.node), tmpTo);
-        }
-
-        return path;
+    if (edgeFrom.node != edgeTo.node) {
+      throw new IllegalStateException(
+          "Locations of the 'to'- and 'from'-Edge has to be the same." + toString());
     }
 
-    @Override public String toString() {
-        return "distance:" + weight + ", from:" + edgeFrom + ", to:" + edgeTo;
+    if (switchWrapper) {
+      EdgeEntry ee = edgeFrom;
+      edgeFrom = edgeTo;
+      edgeTo = ee;
     }
+
+    Path path = new Path();
+    EdgeEntry currEdge = edgeFrom;
+    while (currEdge.prevEntry != null) {
+      int tmpFrom = currEdge.node;
+      path.add(tmpFrom);
+      currEdge = currEdge.prevEntry;
+      path.updateProperties(g.getIncoming(tmpFrom), currEdge.node);
+    }
+    path.add(currEdge.node);
+    path.reverseOrder();
+
+    currEdge = edgeTo;
+    while (currEdge.prevEntry != null) {
+      int tmpTo = currEdge.node;
+      currEdge = currEdge.prevEntry;
+      path.add(currEdge.node);
+      path.updateProperties(g.getIncoming(currEdge.node), tmpTo);
+    }
+
+    return path;
+  }
+
+  @Override
+  public String toString() {
+    return "distance:" + weight + ", from:" + edgeFrom + ", to:" + edgeTo;
+  }
 }

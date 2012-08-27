@@ -16,21 +16,21 @@
 package de.jetsli.graph.util;
 
 /**
- *
  * @author Peter Karich, info@jetsli.de
  */
 public class BooleanRef {
 
-    public boolean value;
+  public boolean value;
 
-    public BooleanRef() {
-    }
+  public BooleanRef() {
+  }
 
-    public BooleanRef(boolean value) {
-        this.value = value;
-    }
+  public BooleanRef(boolean value) {
+    this.value = value;
+  }
 
-    @Override public String toString() {
-        return Boolean.toString(value);
-    }
+  @Override
+  public String toString() {
+    return Boolean.toString(value);
+  }
 }

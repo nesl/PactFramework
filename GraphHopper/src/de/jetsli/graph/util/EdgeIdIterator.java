@@ -32,28 +32,33 @@ package de.jetsli.graph.util;
  */
 public interface EdgeIdIterator {
 
-    boolean next();
+  boolean next();
 
-    int nodeId();
+  int nodeId();
 
-    double distance();
+  double distance();
 
-    int flags();
-    public static final EdgeIdIterator EMPTY = new EdgeIdIterator() {
-        @Override public boolean next() {
-            return false;
-        }
+  int flags();
 
-        @Override public int nodeId() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
+  public static final EdgeIdIterator EMPTY = new EdgeIdIterator() {
+    @Override
+    public boolean next() {
+      return false;
+    }
 
-        @Override public double distance() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
+    @Override
+    public int nodeId() {
+      throw new UnsupportedOperationException("Not supported.");
+    }
 
-        @Override public int flags() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
-    };
+    @Override
+    public double distance() {
+      throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
+    public int flags() {
+      throw new UnsupportedOperationException("Not supported.");
+    }
+  };
 }

@@ -18,6 +18,7 @@ package de.jetsli.graph.util;
 import de.jetsli.graph.coll.MyBitSet;
 import de.jetsli.graph.coll.MyOpenBitSet;
 import de.jetsli.graph.storage.Graph;
+
 import gnu.trove.stack.array.TIntArrayStack;
 
 /**
@@ -27,65 +28,67 @@ import gnu.trove.stack.array.TIntArrayStack;
  */
 public class XFirstSearch {
 
-    /**
-     * interface to use a queue (FIFO) OR a stack (LIFO)
-     */
-    interface HelperColl {
+  /**
+   * interface to use a queue (FIFO) OR a stack (LIFO)
+   */
+  interface HelperColl {
 
-        boolean isEmpty();
+    boolean isEmpty();
 
-        int pop();
+    int pop();
 
-        void push(int v);
+    void push(int v);
+  }
+
+  protected MyBitSet createBitSet(int size) {
+    return new MyOpenBitSet(size);
+  }
+
+  public void start(Graph g, int node, boolean depthFirst) {
+    HelperColl coll;
+    if (depthFirst) {
+      coll = new MyIntStack();
+    } else {
+      coll = new MyHelperIntQueue();
     }
 
-    protected MyBitSet createBitSet(int size) {
-        return new MyOpenBitSet(size);
-    }
+    MyBitSet visited = createBitSet(g.getNodes());
+    visited.add(node);
+    coll.push(node);
+    int current;
 
-    public void start(Graph g, int node, boolean depthFirst) {
-        HelperColl coll;
-        if (depthFirst)
-            coll = new MyIntStack();
-        else
-            coll = new MyHelperIntQueue();
-
-        MyBitSet visited = createBitSet(g.getNodes());
-        visited.add(node);
-        coll.push(node);
-        int current;
-
-        while (!coll.isEmpty()) {
-            current = coll.pop();
-            if (goFurther(current)) {
-                EdgeIdIterator iter = getEdges(g, current);
-                while (iter.next()) {
-                    int nodeId = iter.nodeId();
-                    if (!visited.contains(nodeId)) {
-                        visited.add(nodeId);
-                        coll.push(nodeId);
-                    }
-                }
-            }
+    while (!coll.isEmpty()) {
+      current = coll.pop();
+      if (goFurther(current)) {
+        EdgeIdIterator iter = getEdges(g, current);
+        while (iter.next()) {
+          int nodeId = iter.nodeId();
+          if (!visited.contains(nodeId)) {
+            visited.add(nodeId);
+            coll.push(nodeId);
+          }
         }
+      }
     }
+  }
 
-    protected EdgeIdIterator getEdges(Graph g, int current) {
-        return g.getOutgoing(current);
+  protected EdgeIdIterator getEdges(Graph g, int current) {
+    return g.getOutgoing(current);
+  }
+
+  protected boolean goFurther(int nodeId) {
+    return true;
+  }
+
+  static class MyIntStack extends TIntArrayStack implements HelperColl {
+
+    @Override
+    public boolean isEmpty() {
+      return super.size() == 0;
     }
+  }
 
-    protected boolean goFurther(int nodeId) {
-        return true;
-    }
+  static class MyHelperIntQueue extends MyIntDeque implements HelperColl {
 
-    static class MyIntStack extends TIntArrayStack implements HelperColl {
-
-        @Override
-        public boolean isEmpty() {
-            return super.size() == 0;
-        }
-    }
-
-    static class MyHelperIntQueue extends MyIntDeque implements HelperColl {
-    }
+  }
 }

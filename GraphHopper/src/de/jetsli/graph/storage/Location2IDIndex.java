@@ -23,7 +23,7 @@ package de.jetsli.graph.storage;
  */
 public interface Location2IDIndex {
 
-    Location2IDIndex prepareIndex(int capacity);
+  Location2IDIndex prepareIndex(int capacity);
 
-    int findID(final double lat, final double lon);
+  int findID(final double lat, final double lon);
 }

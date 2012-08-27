@@ -17,29 +17,29 @@ package de.jetsli.graph.util.shapes;
 
 /**
  * A shape interface to implement circles or rectangles.
- * 
+ *
  * @author Peter Karich
  */
 public interface Shape {
 
-    /**
-     * @return true if edges or areas of this and the specified shapes overlap
-     */
-    boolean intersect(Shape o);
+  /**
+   * @return true if edges or areas of this and the specified shapes overlap
+   */
+  boolean intersect(Shape o);
 
-    /**
-     * @return true only if lat and lon are inside (or on the edge) of this shape
-     */
-    boolean contains(double lat, double lon);
+  /**
+   * @return true only if lat and lon are inside (or on the edge) of this shape
+   */
+  boolean contains(double lat, double lon);
 
-    /**
-     * @return true if the specified shape is fully contained in this shape. Only iff
-     * s1.contains(s2) && && s2.contains(s1) then s1 is equal to s2
-     */
-    boolean contains(Shape s);
+  /**
+   * @return true if the specified shape is fully contained in this shape. Only iff
+   *         s1.contains(s2) && && s2.contains(s1) then s1 is equal to s2
+   */
+  boolean contains(Shape s);
 
-    /**
-     * @return the minimal rectangular bounding box of this shape
-     */
-    BBox getBBox();
+  /**
+   * @return the minimal rectangular bounding box of this shape
+   */
+  BBox getBBox();
 }

@@ -24,15 +24,15 @@ package de.jetsli.graph.coll;
  */
 public interface MyBitSet {
 
-    boolean contains(int index);
+  boolean contains(int index);
 
-    void add(int index);
+  void add(int index);
 
-    int getCardinality();
+  int getCardinality();
 
-    void clear();
+  void clear();
 
-    void ensureCapacity(int size);
+  void ensureCapacity(int size);
 
-    int next(int index);
+  int next(int index);
 }

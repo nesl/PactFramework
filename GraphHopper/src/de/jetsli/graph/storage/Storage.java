@@ -16,6 +16,7 @@
 package de.jetsli.graph.storage;
 
 import de.jetsli.graph.util.CalcDistance;
+
 import java.io.Closeable;
 
 /**
@@ -25,23 +26,23 @@ import java.io.Closeable;
  */
 public interface Storage extends Closeable {
 
-    Graph getGraph();
-    
-    boolean loadExisting();
-    
-    void createNew();
+  Graph getGraph();
 
-    boolean addNode(int osmId, double lat, double lon);
+  boolean loadExisting();
 
-    boolean addEdge(int nodeIdFrom, int nodeIdTo, int flags, CalcDistance callback);
+  void createNew();
 
-    int getNodes();
+  boolean addNode(int osmId, double lat, double lon);
 
-    void flush();
+  boolean addEdge(int nodeIdFrom, int nodeIdTo, int flags, CalcDistance callback);
 
-    public void stats();
+  int getNodes();
 
-    public void setHasHighways(int osmId, boolean isHighway);
+  void flush();
 
-    public boolean hasHighways(int osmId);
+  public void stats();
+
+  public void setHasHighways(int osmId, boolean isHighway);
+
+  public boolean hasHighways(int osmId);
 }

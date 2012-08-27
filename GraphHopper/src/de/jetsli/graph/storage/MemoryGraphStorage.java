@@ -19,13 +19,13 @@ package de.jetsli.graph.storage;
  * @author Peter Karich, info@jetsli.de
  */
 public class MemoryGraphStorage extends DefaultStorage {
-    
-    public MemoryGraphStorage(int expectedNodes) {        
-        super(expectedNodes);
-    }
 
-    @Override
-    public void createNew() {
-        g = new MemoryGraph(osmIdToIndexMap.size());
-    }
+  public MemoryGraphStorage(int expectedNodes) {
+    super(expectedNodes);
+  }
+
+  @Override
+  public void createNew() {
+    g = new MemoryGraph(osmIdToIndexMap.size());
+  }
 }

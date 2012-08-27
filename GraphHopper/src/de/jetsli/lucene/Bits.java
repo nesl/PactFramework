@@ -23,48 +23,49 @@ package de.jetsli.lucene;
  */
 public interface Bits {
 
-    public boolean get(int index);
+  public boolean get(int index);
 
-    public int length();
-    public static final Bits[] EMPTY_ARRAY = new Bits[0];
+  public int length();
 
-    /**
-     * Bits impl of the specified length with all bits set.
-     */
-    public static class MatchAllBits implements Bits {
+  public static final Bits[] EMPTY_ARRAY = new Bits[0];
 
-        final int len;
+  /**
+   * Bits impl of the specified length with all bits set.
+   */
+  public static class MatchAllBits implements Bits {
 
-        public MatchAllBits(int len) {
-            this.len = len;
-        }
+    final int len;
 
-        public boolean get(int index) {
-            return true;
-        }
-
-        public int length() {
-            return len;
-        }
+    public MatchAllBits(int len) {
+      this.len = len;
     }
 
-    /**
-     * Bits impl of the specified length with no bits set.
-     */
-    public static class MatchNoBits implements Bits {
-
-        final int len;
-
-        public MatchNoBits(int len) {
-            this.len = len;
-        }
-
-        public boolean get(int index) {
-            return false;
-        }
-
-        public int length() {
-            return len;
-        }
+    public boolean get(int index) {
+      return true;
     }
+
+    public int length() {
+      return len;
+    }
+  }
+
+  /**
+   * Bits impl of the specified length with no bits set.
+   */
+  public static class MatchNoBits implements Bits {
+
+    final int len;
+
+    public MatchNoBits(int len) {
+      this.len = len;
+    }
+
+    public boolean get(int index) {
+      return false;
+    }
+
+    public int length() {
+      return len;
+    }
+  }
 }

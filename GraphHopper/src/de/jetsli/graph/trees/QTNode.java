@@ -23,21 +23,21 @@ package de.jetsli.graph.trees;
  */
 interface QTNode<V> {
 
-    QTNode<V> get(int num);
+  QTNode<V> get(int num);
 
-    void set(int num, QTNode<V> n);
+  void set(int num, QTNode<V> n);
 
-    boolean hasData();
+  boolean hasData();
 
-    /**
-     * This methods returns the memory usage for PerfTest without the memory of the values.
-     * I.e. you need to add sizeOf(V)*noOfNodes
-     *
-     * @param factor is 1 for 32 bit and 2 for 64 bit systems
-     */
-    long getMemoryUsageInBytes(int factor);
-    
-    int count();
+  /**
+   * This methods returns the memory usage for PerfTest without the memory of the values. I.e. you
+   * need to add sizeOf(V)*noOfNodes
+   *
+   * @param factor is 1 for 32 bit and 2 for 64 bit systems
+   */
+  long getMemoryUsageInBytes(int factor);
 
-    long getEmptyEntries(boolean onlyBranches);
+  int count();
+
+  long getEmptyEntries(boolean onlyBranches);
 }

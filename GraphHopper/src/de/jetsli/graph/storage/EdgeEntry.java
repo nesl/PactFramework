@@ -16,31 +16,31 @@
 package de.jetsli.graph.storage;
 
 /**
- * @see DistEntry
  * @author Peter Karich, info@jetsli.de
+ * @see DistEntry
  */
 public class EdgeEntry extends Edge implements Cloneable {
 
-    public EdgeEntry prevEntry;
+  public EdgeEntry prevEntry;
 
-    public EdgeEntry(int loc, double distance) {
-        super(loc, distance);
-    }
+  public EdgeEntry(int loc, double distance) {
+    super(loc, distance);
+  }
 
-    @Override
-    public EdgeEntry clone() {
-        return new EdgeEntry(node, weight);
-    }
+  @Override
+  public EdgeEntry clone() {
+    return new EdgeEntry(node, weight);
+  }
 
-    public EdgeEntry cloneFull() {
-        EdgeEntry de = clone();
-        EdgeEntry tmpPrev = prevEntry;
-        EdgeEntry cl = de;
-        while (tmpPrev != null) {
-            cl.prevEntry = tmpPrev.clone();
-            cl = cl.prevEntry;
-            tmpPrev = tmpPrev.prevEntry;
-        }
-        return de;
+  public EdgeEntry cloneFull() {
+    EdgeEntry de = clone();
+    EdgeEntry tmpPrev = prevEntry;
+    EdgeEntry cl = de;
+    while (tmpPrev != null) {
+      cl.prevEntry = tmpPrev.clone();
+      cl = cl.prevEntry;
+      tmpPrev = tmpPrev.prevEntry;
     }
+    return de;
+  }
 }

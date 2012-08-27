@@ -20,38 +20,39 @@ package de.jetsli.graph.storage;
  */
 public class MMapGraphStorage extends DefaultStorage {
 
-    private final String file;
+  private final String file;
 
-    public MMapGraphStorage(String file, int expectedNodes) {
-        super(expectedNodes);
-        this.file = file;
-    }
+  public MMapGraphStorage(String file, int expectedNodes) {
+    super(expectedNodes);
+    this.file = file;
+  }
 
-    @Override
-    public boolean loadExisting() {
-        g = new MMapGraph(file, -1);
-        return getMMapGraph().loadExisting();
-    }
-    
-    private MMapGraph getMMapGraph() {
-        return (MMapGraph) g;
-    }
+  @Override
+  public boolean loadExisting() {
+    g = new MMapGraph(file, -1);
+    return getMMapGraph().loadExisting();
+  }
 
-    @Override
-    public void createNew() {
-        g = new MMapGraph(file, osmIdToIndexMap.size());
-        // createNew(*true*) to avoid slow down for mmap files (and RAM bottlenecks)
-        // but still write to disc at the end!
-        getMMapGraph().createNew(true);
-    }
-    
-    @Override public void stats() {
-        getMMapGraph().stats(true);
-    }
+  private MMapGraph getMMapGraph() {
+    return (MMapGraph) g;
+  }
 
-    @Override
-    public void flush() {
-        getMMapGraph().flush();
-        super.flush();
-    }
+  @Override
+  public void createNew() {
+    g = new MMapGraph(file, osmIdToIndexMap.size());
+    // createNew(*true*) to avoid slow down for mmap files (and RAM bottlenecks)
+    // but still write to disc at the end!
+    getMMapGraph().createNew(true);
+  }
+
+  @Override
+  public void stats() {
+    getMMapGraph().stats(true);
+  }
+
+  @Override
+  public void flush() {
+    getMMapGraph().flush();
+    super.flush();
+  }
 }

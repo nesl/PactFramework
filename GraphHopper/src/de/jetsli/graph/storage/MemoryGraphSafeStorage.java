@@ -16,6 +16,7 @@
 package de.jetsli.graph.storage;
 
 import de.jetsli.graph.util.Helper;
+
 import java.io.File;
 
 /**
@@ -23,30 +24,32 @@ import java.io.File;
  */
 public class MemoryGraphSafeStorage extends DefaultStorage {
 
-    private final String folder;
+  private final String folder;
 
-    public MemoryGraphSafeStorage(String file, int expectedNodes) {
-        super(expectedNodes);
-        this.folder = file;
-    }
+  public MemoryGraphSafeStorage(String file, int expectedNodes) {
+    super(expectedNodes);
+    this.folder = file;
+  }
 
-    @Override
-    public void createNew() {
-        Helper.deleteDir(new File(folder));
-        // in order to avoid reallocation allocate enough memory. 
-        // edges will be incrementally allocated so it is not that important to match the size up front
-        g = new MemoryGraphSafe(folder, osmIdToIndexMap.size(), Math.round(0.8f * osmIdToIndexMap.size()));
-    }
+  @Override
+  public void createNew() {
+    Helper.deleteDir(new File(folder));
+    // in order to avoid reallocation allocate enough memory.
+    // edges will be incrementally allocated so it is not that important to match the size up front
+    g =
+        new MemoryGraphSafe(folder, osmIdToIndexMap.size(),
+                            Math.round(0.8f * osmIdToIndexMap.size()));
+  }
 
-    @Override
-    public boolean loadExisting() {
-        g = new MemoryGraphSafe(folder, 0);
-        return g.getNodes() > 0;
-    }
+  @Override
+  public boolean loadExisting() {
+    g = new MemoryGraphSafe(folder, 0);
+    return g.getNodes() > 0;
+  }
 
-    @Override
-    public void flush() {
-        ((MemoryGraphSafe) g).flush();
-        super.flush();
-    }
+  @Override
+  public void flush() {
+    ((MemoryGraphSafe) g).flush();
+    super.flush();
+  }
 }

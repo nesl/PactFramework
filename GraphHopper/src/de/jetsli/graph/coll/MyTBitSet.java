@@ -18,49 +18,51 @@ package de.jetsli.graph.coll;
 import gnu.trove.set.hash.TIntHashSet;
 
 /**
- *
  * @author Peter Karich, info@jetsli.de
  */
 public class MyTBitSet implements MyBitSet {
 
-    private final TIntHashSet tHash;
+  private final TIntHashSet tHash;
 
-    public MyTBitSet(int no) {
-        tHash = new TIntHashSet(no);
-    }
+  public MyTBitSet(int no) {
+    tHash = new TIntHashSet(no);
+  }
 
-    public MyTBitSet() {
-        this(1000);
-    }
+  public MyTBitSet() {
+    this(1000);
+  }
 
-    @Override public boolean contains(int index) {
-        return tHash.contains(index);
-    }
+  @Override
+  public boolean contains(int index) {
+    return tHash.contains(index);
+  }
 
-    @Override public void add(int index) {
-        tHash.add(index);
-    }
+  @Override
+  public void add(int index) {
+    tHash.add(index);
+  }
 
-    @Override public String toString() {
-        return tHash.toString();
-    }
+  @Override
+  public String toString() {
+    return tHash.toString();
+  }
 
-    @Override
-    public int getCardinality() {
-        return tHash.size();
-    }
+  @Override
+  public int getCardinality() {
+    return tHash.size();
+  }
 
-    @Override
-    public void clear() {
-        tHash.clear();
-    }        
+  @Override
+  public void clear() {
+    tHash.clear();
+  }
 
-    @Override
-    public void ensureCapacity(int size) {        
-    }
+  @Override
+  public void ensureCapacity(int size) {
+  }
 
-    @Override
-    public int next(int index) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+  @Override
+  public int next(int index) {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }

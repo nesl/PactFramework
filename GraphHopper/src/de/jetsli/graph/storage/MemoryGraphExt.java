@@ -16,6 +16,7 @@
 package de.jetsli.graph.storage;
 
 import de.jetsli.graph.util.Helper;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -26,88 +27,91 @@ import java.util.Arrays;
  */
 public class MemoryGraphExt extends MemoryGraphSafe {
 
-    private int[] priorities;
+  private int[] priorities;
 
-    public MemoryGraphExt(int cap) {
-        super(cap);
+  public MemoryGraphExt(int cap) {
+    super(cap);
+  }
+
+  public MemoryGraphExt(String storageDir, int cap, int capEdge) {
+    super(storageDir, cap, capEdge);
+  }
+
+  @Override
+  protected int ensureNodeIndex(int index) {
+    int cap = super.ensureNodeIndex(index);
+    if (cap > 0) {
+      priorities = Arrays.copyOf(priorities, cap);
     }
+    return cap;
+  }
 
-    public MemoryGraphExt(String storageDir, int cap, int capEdge) {
-        super(storageDir, cap, capEdge);
+  public int getPriority(int index) {
+    return priorities[index];
+  }
+
+  @Override
+  protected void initNodes(int cap) {
+    super.initNodes(cap);
+    priorities = new int[cap];
+  }
+
+  @Override
+  protected void internalEdgeAdd(int fromNodeId, int toNodeId, double dist, int flags) {
+    super.internalEdgeAdd(fromNodeId, toNodeId, dist, flags);
+
+    // TODO sort by priority but include the latest entry too!
+    // Collections.sort(list, listPrioSorter);
+    // int len = list.size();
+    // for (int i = 0; i < len; i++) {
+    //    int pointer = list.get(i);
+    //    copyEdge();
+    // }
+  }
+
+  @Override
+  public void optimize() {
+    super.optimize();
+    // TODO change priorities too!
+  }
+
+  @Override
+  protected MemoryGraphSafe creatThis(String storage, int nodes, int edges) {
+    return new MemoryGraphExt(storage, nodes, edges);
+  }
+
+  @Override
+  public Graph clone() {
+    MemoryGraphExt clonedGraph = (MemoryGraphExt) super.clone();
+    System.arraycopy(priorities, 0, clonedGraph.priorities, 0, priorities.length);
+    return clonedGraph;
+  }
+
+  @Override
+  public boolean save() {
+    boolean saved = super.save();
+    if (saved) {
+      try {
+        Helper.writeInts(getStorageLocation() + "/priorities", priorities);
+      } catch (IOException ex) {
+        throw new RuntimeException("Couldn't write data to disc. location=" + getStorageLocation(),
+                                   ex);
+      }
     }
+    return saved;
+  }
 
-    @Override
-    protected int ensureNodeIndex(int index) {
-        int cap = super.ensureNodeIndex(index);
-        if (cap > 0)
-            priorities = Arrays.copyOf(priorities, cap);
-        return cap;
+  @Override
+  public boolean loadExisting(String storageDir) {
+    if (super.loadExisting(storageDir)) {
+      try {
+        priorities = Helper.readInts(getStorageLocation() + "/priorities");
+        return true;
+      } catch (IOException ex) {
+        throw new RuntimeException("Couldn't load data from disc. location=" + getStorageLocation(),
+                                   ex);
+      }
     }
-
-    public int getPriority(int index) {
-        return priorities[index];
-    }
-
-    @Override
-    protected void initNodes(int cap) {
-        super.initNodes(cap);
-        priorities = new int[cap];
-    }
-
-    @Override
-    protected void internalEdgeAdd(int fromNodeId, int toNodeId, double dist, int flags) {
-        super.internalEdgeAdd(fromNodeId, toNodeId, dist, flags);
-
-        // TODO sort by priority but include the latest entry too!        
-        // Collections.sort(list, listPrioSorter);
-        // int len = list.size();
-        // for (int i = 0; i < len; i++) {
-        //    int pointer = list.get(i);
-        //    copyEdge();
-        // }
-    }
-
-    @Override
-    public void optimize() {
-        super.optimize();
-        // TODO change priorities too!
-    }
-
-    @Override
-    protected MemoryGraphSafe creatThis(String storage, int nodes, int edges) {
-        return new MemoryGraphExt(storage, nodes, edges);
-    }
-
-    @Override
-    public Graph clone() {
-        MemoryGraphExt clonedGraph = (MemoryGraphExt) super.clone();
-        System.arraycopy(priorities, 0, clonedGraph.priorities, 0, priorities.length);
-        return clonedGraph;
-    }
-
-    @Override
-    public boolean save() {
-        boolean saved = super.save();
-        if (saved) {
-            try {
-                Helper.writeInts(getStorageLocation() + "/priorities", priorities);
-            } catch (IOException ex) {
-                throw new RuntimeException("Couldn't write data to disc. location=" + getStorageLocation(), ex);
-            }
-        }
-        return saved;
-    }
-
-    @Override
-    public boolean loadExisting(String storageDir) {
-        if (super.loadExisting(storageDir)) {
-            try {
-                priorities = Helper.readInts(getStorageLocation() + "/priorities");
-                return true;
-            } catch (IOException ex) {
-                throw new RuntimeException("Couldn't load data from disc. location=" + getStorageLocation(), ex);
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 }

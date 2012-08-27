@@ -25,48 +25,48 @@ import de.jetsli.graph.util.EdgeIdIterator;
  */
 public interface Graph {
 
-    /**
-     * @return the number of indirectly created locations. E.g. via setNode() or edge()
-     */
-    int getNodes();
+  /**
+   * @return the number of indirectly created locations. E.g. via setNode() or edge()
+   */
+  int getNodes();
 
-    /**
-     * This method ensures that the node with the specified index exists and sets the lat+lon to the
-     * specified values. The index goes from 0 (inclusive) to getNodes() (exclusive)
-     */
-    void setNode(int index, double lat, double lon);
+  /**
+   * This method ensures that the node with the specified index exists and sets the lat+lon to the
+   * specified values. The index goes from 0 (inclusive) to getNodes() (exclusive)
+   */
+  void setNode(int index, double lat, double lon);
 
-    double getLatitude(int index);
+  double getLatitude(int index);
 
-    double getLongitude(int index);
+  double getLongitude(int index);
 
-    /**
-     * @param a index of the starting node of the edge
-     * @param b index of the ending node of the edge
-     * @param distance necessary if no setNode is called - e.g. if the graph is not a geo-graph
-     * @param flags see CarFlags - involves velocity and direction
-     */    
-    void edge(int a, int b, double distance, int flags);
-    
-    void edge(int a, int b, double distance, boolean bothDirections);
+  /**
+   * @param a        index of the starting node of the edge
+   * @param b        index of the ending node of the edge
+   * @param distance necessary if no setNode is called - e.g. if the graph is not a geo-graph
+   * @param flags    see CarFlags - involves velocity and direction
+   */
+  void edge(int a, int b, double distance, int flags);
 
-    EdgeIdIterator getEdges(int index);
+  void edge(int a, int b, double distance, boolean bothDirections);
 
-    EdgeIdIterator getIncoming(int index);
+  EdgeIdIterator getEdges(int index);
 
-    EdgeIdIterator getOutgoing(int index);
+  EdgeIdIterator getIncoming(int index);
 
-    Graph clone();
+  EdgeIdIterator getOutgoing(int index);
 
-    /**
-     * Schedule the deletion of the specified node until an optimize() call happens
-     */
-    void markNodeDeleted(int index);
+  Graph clone();
 
-    boolean isDeleted(int index);
+  /**
+   * Schedule the deletion of the specified node until an optimize() call happens
+   */
+  void markNodeDeleted(int index);
 
-    /**
-     * Performs optimization routines like deletion or node rearrangements.
-     */
-    void optimize();
+  boolean isDeleted(int index);
+
+  /**
+   * Performs optimization routines like deletion or node rearrangements.
+   */
+  void optimize();
 }

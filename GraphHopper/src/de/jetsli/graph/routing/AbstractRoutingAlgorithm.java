@@ -19,37 +19,38 @@ import de.jetsli.graph.reader.CarFlags;
 import de.jetsli.graph.storage.EdgeEntry;
 import de.jetsli.graph.storage.Graph;
 import de.jetsli.graph.util.EdgeIdIterator;
-import de.jetsli.graph.util.GraphUtility;
 
 /**
  * @author Peter Karich
  */
 public abstract class AbstractRoutingAlgorithm implements RoutingAlgorithm {
 
-    protected AlgoType type = AlgoType.SHORTEST;
-    protected Graph graph;
+  protected AlgoType type = AlgoType.SHORTEST;
+  protected Graph graph;
 
-    public AbstractRoutingAlgorithm(Graph graph) {
-        this.graph = graph;
+  public AbstractRoutingAlgorithm(Graph graph) {
+    this.graph = graph;
+  }
+
+  @Override
+  public RoutingAlgorithm setType(AlgoType type) {
+    this.type = type;
+    return this;
+  }
+
+  public void updateShortest(EdgeEntry shortestDE, int currLoc) {
+  }
+
+  @Override
+  public RoutingAlgorithm clear() {
+    return this;
+  }
+
+  protected double getWeight(EdgeIdIterator iter) {
+    if (AlgoType.FASTEST.equals(type)) {
+      return iter.distance() / CarFlags.getSpeedPart(iter.flags());
+    } else {
+      return iter.distance();
     }
-
-    @Override
-    public RoutingAlgorithm setType(AlgoType type) {
-        this.type = type;
-        return this;
-    }
-
-    public void updateShortest(EdgeEntry shortestDE, int currLoc) {
-    }
-
-    @Override public RoutingAlgorithm clear() {
-        return this;
-    }
-
-    protected double getWeight(EdgeIdIterator iter) {
-        if (AlgoType.FASTEST.equals(type)) {
-            return iter.distance() / CarFlags.getSpeedPart(iter.flags());
-        } else
-            return iter.distance();
-    }    
+  }
 }

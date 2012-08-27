@@ -22,122 +22,133 @@ import de.jetsli.graph.util.CalcDistance;
  */
 public class Circle implements Shape {
 
-    private final static CalcDistance SINGLETON = new CalcDistance();
-    private CalcDistance calc = new CalcDistance();
-    private final double radiusInKm;
-    private final double lat;
-    private final double lon;
-    private final double normedDist;
-    private final BBox bbox;
+  private final static CalcDistance SINGLETON = new CalcDistance();
+  private CalcDistance calc = new CalcDistance();
+  private final double radiusInKm;
+  private final double lat;
+  private final double lon;
+  private final double normedDist;
+  private final BBox bbox;
 
-    public Circle(double lat, double lon, double radiusInKm) {
-        this(lat, lon, radiusInKm, SINGLETON);
+  public Circle(double lat, double lon, double radiusInKm) {
+    this(lat, lon, radiusInKm, SINGLETON);
+  }
+
+  public Circle(double lat, double lon, double radiusInKm, CalcDistance calc) {
+    this.calc = calc;
+    this.lat = lat;
+    this.lon = lon;
+    this.radiusInKm = radiusInKm;
+    this.normedDist = calc.normalizeDist(radiusInKm);
+    bbox = calc.createBBox(lat, lon, radiusInKm);
+  }
+
+  public double getLat() {
+    return lat;
+  }
+
+  public double getLon() {
+    return lon;
+  }
+
+  @Override
+  public boolean contains(double lat1, double lon1) {
+    return normDist(lat1, lon1) <= normedDist;
+  }
+
+  @Override
+  public BBox getBBox() {
+    return bbox;
+  }
+
+  private double normDist(double lat1, double lon1) {
+    return calc.calcNormalizedDist(lat, lon, lat1, lon1);
+  }
+
+  @Override
+  public boolean intersect(Shape o) {
+    if (o instanceof Circle) {
+      return intersect((Circle) o);
+    } else if (o instanceof BBox) {
+      return intersect((BBox) o);
     }
 
-    public Circle(double lat, double lon, double radiusInKm, CalcDistance calc) {
-        this.calc = calc;
-        this.lat = lat;
-        this.lon = lon;
-        this.radiusInKm = radiusInKm;
-        this.normedDist = calc.normalizeDist(radiusInKm);
-        bbox = calc.createBBox(lat, lon, radiusInKm);
+    return o.intersect(this);
+  }
+
+  @Override
+  public boolean contains(Shape o) {
+    if (o instanceof Circle) {
+      return contains((Circle) o);
+    } else if (o instanceof BBox) {
+      return contains((BBox) o);
     }
 
-    public double getLat() {
-        return lat;
+    throw new UnsupportedOperationException("unsupported shape");
+  }
+
+  public boolean intersect(BBox b) {
+    // test top intersect
+    if (lat > b.maxLat) {
+      if (lon < b.minLon) {
+        return normDist(b.maxLat, b.minLon) <= normedDist;
+      }
+      if (lon > b.maxLon) {
+        return normDist(b.maxLat, b.maxLon) <= normedDist;
+      }
+      return b.maxLat - bbox.minLat > 0;
     }
 
-    public double getLon() {
-        return lon;
+    // test bottom intersect
+    if (lat < b.minLat) {
+      if (lon < b.minLon) {
+        return normDist(b.minLat, b.minLon) <= normedDist;
+      }
+      if (lon > b.maxLon) {
+        return normDist(b.minLat, b.maxLon) <= normedDist;
+      }
+      return bbox.maxLat - b.minLat > 0;
     }
 
-    @Override
-    public boolean contains(double lat1, double lon1) {
-        return normDist(lat1, lon1) <= normedDist;
+    // test middle intersect
+    if (lon < b.minLon) {
+      return bbox.maxLon - b.minLon > 0;
+    }
+    if (lon > b.maxLon) {
+      return b.maxLon - bbox.minLon > 0;
+    }
+    return true;
+  }
+
+  public boolean intersect(Circle c) {
+    // necessary to improve speed?
+    if (!getBBox().intersect(c.getBBox())) {
+      return false;
     }
 
-    @Override
-    public BBox getBBox() {
-        return bbox;
+    return normDist(c.lat, c.lon) <= calc.normalizeDist(radiusInKm + c.radiusInKm);
+  }
+
+  public boolean contains(BBox b) {
+    if (bbox.contains(b)) {
+      return contains(b.maxLat, b.minLon) && contains(b.minLat, b.minLon)
+             && contains(b.maxLat, b.maxLon) && contains(b.minLat, b.maxLon);
     }
 
-    private double normDist(double lat1, double lon1) {
-        return calc.calcNormalizedDist(lat, lon, lat1, lon1);
+    return false;
+  }
+
+  public boolean contains(Circle c) {
+    double res = radiusInKm - c.radiusInKm;
+    if (res < 0) {
+      return false;
     }
 
-    @Override
-    public boolean intersect(Shape o) {
-        if (o instanceof Circle) {
-            return intersect((Circle) o);
-        } else if (o instanceof BBox)
-            return intersect((BBox) o);
+    return calc.calcDistKm(lat, lon, c.lat, c.lon) <= res;
+  }
 
-        return o.intersect(this);
-    }
-
-    @Override
-    public boolean contains(Shape o) {
-        if (o instanceof Circle) {
-            return contains((Circle) o);
-        } else if (o instanceof BBox)
-            return contains((BBox) o);
-
-        throw new UnsupportedOperationException("unsupported shape");
-    }
-
-    public boolean intersect(BBox b) {
-        // test top intersect
-        if (lat > b.maxLat) {
-            if (lon < b.minLon)
-                return normDist(b.maxLat, b.minLon) <= normedDist;
-            if (lon > b.maxLon)
-                return normDist(b.maxLat, b.maxLon) <= normedDist;
-            return b.maxLat - bbox.minLat > 0;
-        }
-
-        // test bottom intersect
-        if (lat < b.minLat) {
-            if (lon < b.minLon)
-                return normDist(b.minLat, b.minLon) <= normedDist;
-            if (lon > b.maxLon)
-                return normDist(b.minLat, b.maxLon) <= normedDist;
-            return bbox.maxLat - b.minLat > 0;
-        }
-
-        // test middle intersect
-        if (lon < b.minLon)
-            return bbox.maxLon - b.minLon > 0;
-        if (lon > b.maxLon)
-            return b.maxLon - bbox.minLon > 0;
-        return true;
-    }
-
-    public boolean intersect(Circle c) {
-        // necessary to improve speed?
-        if (!getBBox().intersect(c.getBBox()))
-            return false;
-
-        return normDist(c.lat, c.lon) <= calc.normalizeDist(radiusInKm + c.radiusInKm);
-    }
-
-    public boolean contains(BBox b) {
-        if (bbox.contains(b))
-            return contains(b.maxLat, b.minLon) && contains(b.minLat, b.minLon)
-                    && contains(b.maxLat, b.maxLon) && contains(b.minLat, b.maxLon);
-
-        return false;
-    }
-
-    public boolean contains(Circle c) {
-        double res = radiusInKm - c.radiusInKm;
-        if (res < 0)
-            return false;
-
-        return calc.calcDistKm(lat, lon, c.lat, c.lon) <= res;
-    }
-
-    @Override
-    public String toString() {
-        return lat + "," + lon + ", radius:" + radiusInKm;
-    }
+  @Override
+  public String toString() {
+    return lat + "," + lon + ", radius:" + radiusInKm;
+  }
 }

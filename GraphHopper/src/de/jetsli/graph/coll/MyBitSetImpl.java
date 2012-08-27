@@ -22,34 +22,34 @@ import java.util.BitSet;
  */
 public class MyBitSetImpl extends BitSet implements MyBitSet {
 
-    public MyBitSetImpl() {
-    }
+  public MyBitSetImpl() {
+  }
 
-    public MyBitSetImpl(int nbits) {
-        super(nbits);
-    }
+  public MyBitSetImpl(int nbits) {
+    super(nbits);
+  }
 
-    @Override
-    public boolean contains(int index) {
-        return super.get(index);
-    }
+  @Override
+  public boolean contains(int index) {
+    return super.get(index);
+  }
 
-    @Override
-    public void add(int index) {
-        super.set(index);
-    }
+  @Override
+  public void add(int index) {
+    super.set(index);
+  }
 
-    @Override
-    public int getCardinality() {
-        return super.cardinality();
-    }        
+  @Override
+  public int getCardinality() {
+    return super.cardinality();
+  }
 
-    @Override
-    public void ensureCapacity(int size) {
-    }
+  @Override
+  public void ensureCapacity(int size) {
+  }
 
-    @Override
-    public int next(int index) {
-        return super.nextSetBit(index);
-    }
+  @Override
+  public int next(int index) {
+    return super.nextSetBit(index);
+  }
 }

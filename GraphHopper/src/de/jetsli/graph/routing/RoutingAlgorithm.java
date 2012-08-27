@@ -22,12 +22,12 @@ package de.jetsli.graph.routing;
  */
 public interface RoutingAlgorithm {
 
-    /**
-     * Calculates the fastest or shortest path
-     */
-    Path calcPath(int from, int to);
+  /**
+   * Calculates the fastest or shortest path
+   */
+  Path calcPath(int from, int to);
 
-    RoutingAlgorithm setType(AlgoType type);
+  RoutingAlgorithm setType(AlgoType type);
 
-    RoutingAlgorithm clear();
+  RoutingAlgorithm clear();
 }

@@ -16,21 +16,21 @@
 package de.jetsli.graph.util;
 
 /**
- *
  * @author Peter Karich, info@jetsli.de
  */
 public class IntegerRef {
 
-    public int value;
+  public int value;
 
-    public IntegerRef() {
-    }
+  public IntegerRef() {
+  }
 
-    public IntegerRef(int value) {
-        this.value = value;
-    }
+  public IntegerRef(int value) {
+    this.value = value;
+  }
 
-    @Override public String toString() {
-        return Integer.toString(value);
-    }        
+  @Override
+  public String toString() {
+    return Integer.toString(value);
+  }
 }

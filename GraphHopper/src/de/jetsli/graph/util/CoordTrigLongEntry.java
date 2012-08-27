@@ -16,30 +16,32 @@
 package de.jetsli.graph.util;
 
 /**
- *
  * @author Peter Karich, info@jetsli.de
  */
 public class CoordTrigLongEntry extends CoordTrig<Long> {
 
-    private long v;
+  private long v;
 
-    public CoordTrigLongEntry() {
-    }
+  public CoordTrigLongEntry() {
+  }
 
-    public CoordTrigLongEntry(long o, double lat, double lon) {
-        super(lat, lon);
-        this.v = o;
-    }
+  public CoordTrigLongEntry(long o, double lat, double lon) {
+    super(lat, lon);
+    this.v = o;
+  }
 
-    @Override public void setValue(Long t) {
-        v = t;
-    }
+  @Override
+  public void setValue(Long t) {
+    v = t;
+  }
 
-    @Override public Long getValue() {
-        return v;
-    }
+  @Override
+  public Long getValue() {
+    return v;
+  }
 
-    @Override public String toString() {
-        return super.toString() + " value:" + v;
-    }
+  @Override
+  public String toString() {
+    return super.toString() + " value:" + v;
+  }
 }

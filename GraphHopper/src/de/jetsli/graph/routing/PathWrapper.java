@@ -25,64 +25,69 @@ import de.jetsli.graph.util.EdgeWrapper;
  */
 public class PathWrapper {
 
-    public boolean switchWrapper = false;
-    public int fromEdgeId = -1;
-    public int toEdgeId = -1;
-    public double weight;
-    private EdgeWrapper edgeFrom;
-    private EdgeWrapper edgeTo;
-    private Graph g;
+  public boolean switchWrapper = false;
+  public int fromEdgeId = -1;
+  public int toEdgeId = -1;
+  public double weight;
+  private EdgeWrapper edgeFrom;
+  private EdgeWrapper edgeTo;
+  private Graph g;
 
-    public PathWrapper(Graph g, EdgeWrapper edgesFrom, EdgeWrapper edgesTo) {
-        this.g = g;
-        this.edgeFrom = edgesFrom;
-        this.edgeTo = edgesTo;
+  public PathWrapper(Graph g, EdgeWrapper edgesFrom, EdgeWrapper edgesTo) {
+    this.g = g;
+    this.edgeFrom = edgesFrom;
+    this.edgeTo = edgesTo;
+  }
+
+  /**
+   * Extracts path from two shortest-path-tree
+   */
+  public Path extract() {
+    if (fromEdgeId < 0 || toEdgeId < 0) {
+      return null;
     }
 
-    /**
-     * Extracts path from two shortest-path-tree
-     */
-    public Path extract() {
-        if (fromEdgeId < 0 || toEdgeId < 0)
-            return null;
-
-        if (switchWrapper) {
-            int tmp = fromEdgeId;
-            fromEdgeId = toEdgeId;
-            toEdgeId = tmp;
-        }
-
-        int nodeFrom = edgeFrom.getNode(fromEdgeId);
-        int nodeTo = edgeTo.getNode(toEdgeId);
-        if (nodeFrom != nodeTo)
-            throw new IllegalStateException("Locations of 'to' and 'from' DistEntries has to be the same." + toString());
-
-        Path path = new Path();
-        int currEdgeId = fromEdgeId;
-        path.add(nodeFrom);
-        currEdgeId = edgeFrom.getLink(currEdgeId);
-        while (currEdgeId > 0) {
-            int tmpFrom = edgeFrom.getNode(currEdgeId);
-            path.add(tmpFrom);
-            path.updateProperties(g.getIncoming(nodeFrom), tmpFrom);
-            currEdgeId = edgeFrom.getLink(currEdgeId);
-            nodeFrom = tmpFrom;
-        }
-        path.reverseOrder();
-
-        // skip node of toEdgeId (equal to fromEdgeId)
-        currEdgeId = edgeTo.getLink(toEdgeId);
-        while (currEdgeId > 0) {
-            int tmpTo = edgeTo.getNode(currEdgeId);
-            path.add(tmpTo);
-            path.updateProperties(g.getIncoming(tmpTo), nodeTo);
-            currEdgeId = edgeTo.getLink(currEdgeId);
-            nodeTo = tmpTo;
-        }
-        return path;
+    if (switchWrapper) {
+      int tmp = fromEdgeId;
+      fromEdgeId = toEdgeId;
+      toEdgeId = tmp;
     }
 
-    @Override public String toString() {
-        return "distance:" + weight + ", from:" + edgeFrom.getNode(fromEdgeId) + ", to:" + edgeTo.getNode(toEdgeId);
+    int nodeFrom = edgeFrom.getNode(fromEdgeId);
+    int nodeTo = edgeTo.getNode(toEdgeId);
+    if (nodeFrom != nodeTo) {
+      throw new IllegalStateException(
+          "Locations of 'to' and 'from' DistEntries has to be the same." + toString());
     }
+
+    Path path = new Path();
+    int currEdgeId = fromEdgeId;
+    path.add(nodeFrom);
+    currEdgeId = edgeFrom.getLink(currEdgeId);
+    while (currEdgeId > 0) {
+      int tmpFrom = edgeFrom.getNode(currEdgeId);
+      path.add(tmpFrom);
+      path.updateProperties(g.getIncoming(nodeFrom), tmpFrom);
+      currEdgeId = edgeFrom.getLink(currEdgeId);
+      nodeFrom = tmpFrom;
+    }
+    path.reverseOrder();
+
+    // skip node of toEdgeId (equal to fromEdgeId)
+    currEdgeId = edgeTo.getLink(toEdgeId);
+    while (currEdgeId > 0) {
+      int tmpTo = edgeTo.getNode(currEdgeId);
+      path.add(tmpTo);
+      path.updateProperties(g.getIncoming(tmpTo), nodeTo);
+      currEdgeId = edgeTo.getLink(currEdgeId);
+      nodeTo = tmpTo;
+    }
+    return path;
+  }
+
+  @Override
+  public String toString() {
+    return "distance:" + weight + ", from:" + edgeFrom.getNode(fromEdgeId) + ", to:" + edgeTo
+        .getNode(toEdgeId);
+  }
 }

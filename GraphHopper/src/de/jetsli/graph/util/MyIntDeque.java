@@ -24,77 +24,80 @@ import java.util.Arrays;
  */
 public class MyIntDeque {
 
-    private int[] arr;
-    private float factor;
-    private int frontIndex;
-    private int endIndexPlusOne;
+  private int[] arr;
+  private float factor;
+  private int frontIndex;
+  private int endIndexPlusOne;
 
-    public MyIntDeque() {
-        this(100, 2);
+  public MyIntDeque() {
+    this(100, 2);
+  }
+
+  public MyIntDeque(int initSize) {
+    this(initSize, 2);
+  }
+
+  public MyIntDeque(int initSize, float factor) {
+    if ((int) (initSize * factor) <= initSize) {
+      throw new RuntimeException("initial size or increasing factor too low!");
     }
 
-    public MyIntDeque(int initSize) {
-        this(initSize, 2);
+    this.factor = factor;
+    this.arr = new int[initSize];
+  }
+
+  int getCapacity() {
+    return arr.length;
+  }
+
+  public void setFactor(float factor) {
+    this.factor = factor;
+  }
+
+  public boolean isEmpty() {
+    return frontIndex >= endIndexPlusOne;
+  }
+
+  public int pop() {
+    int tmp = arr[frontIndex];
+    frontIndex++;
+
+    // removing the empty space of the front if too much is unused
+    int smallerSize = (int) (arr.length / factor);
+    if (frontIndex > smallerSize) {
+      endIndexPlusOne = size();
+      // ensure that there are at least 10 entries
+      int[] newArr = new int[endIndexPlusOne + 10];
+      System.arraycopy(arr, frontIndex, newArr, 0, endIndexPlusOne);
+      arr = newArr;
+      frontIndex = 0;
     }
 
-    public MyIntDeque(int initSize, float factor) {
-        if ((int) (initSize * factor) <= initSize)
-            throw new RuntimeException("initial size or increasing factor too low!");
+    return tmp;
+  }
 
-        this.factor = factor;
-        this.arr = new int[initSize];
+  public int size() {
+    return endIndexPlusOne - frontIndex;
+  }
+
+  public void push(int v) {
+    if (endIndexPlusOne >= arr.length) {
+      arr = Arrays.copyOf(arr, (int) (arr.length * factor));
     }
 
-    int getCapacity() {
-        return arr.length;
+    arr[endIndexPlusOne] = v;
+    endIndexPlusOne++;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = frontIndex; i < endIndexPlusOne; i++) {
+      if (i > frontIndex) {
+        sb.append(", ");
+      }
+      sb.append(arr[i]);
     }
-
-    public void setFactor(float factor) {
-        this.factor = factor;
-    }
-
-    public boolean isEmpty() {
-        return frontIndex >= endIndexPlusOne;
-    }
-
-    public int pop() {
-        int tmp = arr[frontIndex];
-        frontIndex++;
-
-        // removing the empty space of the front if too much is unused        
-        int smallerSize = (int) (arr.length / factor);
-        if (frontIndex > smallerSize) {
-            endIndexPlusOne = size();
-            // ensure that there are at least 10 entries
-            int[] newArr = new int[endIndexPlusOne + 10];
-            System.arraycopy(arr, frontIndex, newArr, 0, endIndexPlusOne);
-            arr = newArr;
-            frontIndex = 0;
-        }
-
-        return tmp;
-    }
-
-    public int size() {
-        return endIndexPlusOne - frontIndex;
-    }
-
-    public void push(int v) {
-        if (endIndexPlusOne >= arr.length)
-            arr = Arrays.copyOf(arr, (int) (arr.length * factor));
-
-        arr[endIndexPlusOne] = v;
-        endIndexPlusOne++;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = frontIndex; i < endIndexPlusOne; i++) {
-            if (i > frontIndex)
-                sb.append(", ");
-            sb.append(arr[i]);
-        }
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 }

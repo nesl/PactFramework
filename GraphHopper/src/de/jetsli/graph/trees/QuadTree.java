@@ -18,6 +18,7 @@ package de.jetsli.graph.trees;
 import de.jetsli.graph.storage.Graph;
 import de.jetsli.graph.util.CoordTrig;
 import de.jetsli.graph.util.shapes.Shape;
+
 import java.util.Collection;
 
 /**
@@ -28,58 +29,58 @@ import java.util.Collection;
  */
 public interface QuadTree<V> {
 
-    /**
-     * The quadtree could be configured with implementation specific values. After this it needs to
-     * be configured.
-     *
-     * @throws RuntimeException could be thrown
-     */
-    QuadTree init(long maxItemsHint);
+  /**
+   * The quadtree could be configured with implementation specific values. After this it needs to
+   * be configured.
+   *
+   * @throws RuntimeException could be thrown
+   */
+  QuadTree init(long maxItemsHint);
 
-    long size();
+  long size();
 
-    boolean isEmpty();
+  boolean isEmpty();
 
-    void add(double lat, double lon, V value);
+  void add(double lat, double lon, V value);
 
-    int remove(double lat, double lon);
+  int remove(double lat, double lon);
 
-    /**
-     * @return The nodes matching the specified latitude and longitude. If value is null all values
-     * will be returned
-     */
-    Collection<CoordTrig<V>> getNodesFromValue(double lat, double lon, V value);
+  /**
+   * @return The nodes matching the specified latitude and longitude. If value is null all values
+   *         will be returned
+   */
+  Collection<CoordTrig<V>> getNodesFromValue(double lat, double lon, V value);
 
-    /**
-     * @return points near the specified latitude/longitude
-     */
-    Collection<CoordTrig<V>> getNodes(double lat, double lon, double distanceInKm);
+  /**
+   * @return points near the specified latitude/longitude
+   */
+  Collection<CoordTrig<V>> getNodes(double lat, double lon, double distanceInKm);
 
-    Collection<CoordTrig<V>> getNodes(Shape boundingBox);
+  Collection<CoordTrig<V>> getNodes(Shape boundingBox);
 
-    void clear();
+  void clear();
 
-    /**
-     * For debugging purposes
-     */
-    String toDetailString();
+  /**
+   * For debugging purposes
+   */
+  String toDetailString();
 
-    long getMemoryUsageInBytes(int factor);
+  long getMemoryUsageInBytes(int factor);
 
-    /**
-     * Good for memory estimation
-     */
-    long getEmptyEntries(boolean onlyBranches);
+  /**
+   * Good for memory estimation
+   */
+  long getEmptyEntries(boolean onlyBranches);
 
-    class Util {
+  class Util {
 
-        public static void fill(QuadTree<Long> quadTree, Graph graph) {
-            int locs = graph.getNodes();
-            for (int i = 0; i < locs; i++) {
-                double lat = graph.getLatitude(i);
-                double lon = graph.getLongitude(i);
-                quadTree.add(lat, lon, 1L);
-            }
-        }
+    public static void fill(QuadTree<Long> quadTree, Graph graph) {
+      int locs = graph.getNodes();
+      for (int i = 0; i < locs; i++) {
+        double lat = graph.getLatitude(i);
+        double lon = graph.getLongitude(i);
+        quadTree.add(lat, lon, 1L);
+      }
     }
+  }
 }

@@ -17,13 +17,13 @@ package de.jetsli.graph.trees;
 
 /**
  * specify work on the leaf nodes of a quadtree
- * 
+ *
  * @author Peter Karich
  */
 interface LeafWorker<T> {
 
-    /**
-     * @return true if no further search necessary
-     */
-    void doWork(QTDataNode<T> entry, int index);
+  /**
+   * @return true if no further search necessary
+   */
+  void doWork(QTDataNode<T> entry, int index);
 }

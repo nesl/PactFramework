@@ -22,27 +22,27 @@ package de.jetsli.graph.util;
  */
 public class CoordTrig<T> {
 
-    public double lat;
-    public double lon;
+  public double lat;
+  public double lon;
 
-    public CoordTrig() {
-    }
+  public CoordTrig() {
+  }
 
-    public CoordTrig(double lat, double lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
+  public CoordTrig(double lat, double lon) {
+    this.lat = lat;
+    this.lon = lon;
+  }
 
-    public void setValue(T t) {
-        throw new UnsupportedOperationException("Use CoordTrigObjEntry for value access");
-    }
+  public void setValue(T t) {
+    throw new UnsupportedOperationException("Use CoordTrigObjEntry for value access");
+  }
 
-    public T getValue() {
-        throw new UnsupportedOperationException("Use CoordTrigObjEntry for value access");
-    }
+  public T getValue() {
+    throw new UnsupportedOperationException("Use CoordTrigObjEntry for value access");
+  }
 
-    @Override
-    public String toString() {
-        return lat + "," + lon;
-    }
+  @Override
+  public String toString() {
+    return lat + "," + lon;
+  }
 }

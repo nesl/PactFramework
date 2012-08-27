@@ -23,19 +23,19 @@ import de.jetsli.graph.util.shapes.Circle;
  */
 public class Location2IDFullIndex implements Location2IDIndex {
 
-    private CalcDistance calc = new CalcDistance();
-    private Graph g;
+  private CalcDistance calc = new CalcDistance();
+  private Graph g;
 
-    public Location2IDFullIndex(Graph g) {
-        this.g = g;
-    }
+  public Location2IDFullIndex(Graph g) {
+    this.g = g;
+  }
 
-    @Override
-    public Location2IDIndex prepareIndex(int capacity) {
-        return this;
-    }
+  @Override
+  public Location2IDIndex prepareIndex(int capacity) {
+    return this;
+  }
 
-//    @Override
+  //    @Override
 //    public int findID(double lat, double lon) {
 //        Collection<CoordTrig<Long>> coll = qt.getNodes(lat, lon, 0.001);
 //        if (coll.isEmpty())
@@ -43,22 +43,24 @@ public class Location2IDFullIndex implements Location2IDIndex {
 //
 //        return ((Number) coll.iterator().next().getValue()).intValue();
 //    }
-    @Override public int findID(double lat, double lon) {
-        int locs = g.getNodes();
-        int id = -1;
-        Circle circle = null;
-        for (int i = 0; i < locs; i++) {
-            double tmpLat = g.getLatitude(i);
-            double tmpLon = g.getLongitude(i);
-            if (circle == null || circle.contains(tmpLat, tmpLon)) {
-                id = i;
-                double dist = calc.calcDistKm(tmpLat, tmpLon, lat, lon);
-                if (dist <= 0)
-                    break;
-
-                circle = new Circle(lat, lon, dist, calc);
-            }
+  @Override
+  public int findID(double lat, double lon) {
+    int locs = g.getNodes();
+    int id = -1;
+    Circle circle = null;
+    for (int i = 0; i < locs; i++) {
+      double tmpLat = g.getLatitude(i);
+      double tmpLon = g.getLongitude(i);
+      if (circle == null || circle.contains(tmpLat, tmpLon)) {
+        id = i;
+        double dist = calc.calcDistKm(tmpLat, tmpLon, lat, lon);
+        if (dist <= 0) {
+          break;
         }
-        return id;
+
+        circle = new Circle(lat, lon, dist, calc);
+      }
     }
+    return id;
+  }
 }

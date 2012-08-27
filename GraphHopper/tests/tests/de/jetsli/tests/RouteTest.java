@@ -17,13 +17,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * TODO: Give a one line description.
- *          gi
+ * TODO: Give a one line description. gi
+ *
  * @author Kasturi Rangan Raghavan (kastur@gmail.com)
  */
 public class RouteTest extends AndroidTestCase {
 
-  public void testRoute() throws IOException, FileNotFoundException  {
+  public void testRoute() throws IOException, FileNotFoundException {
 
     Graph graph = loadWestwood();
 

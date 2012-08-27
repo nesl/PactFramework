@@ -20,27 +20,26 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
  * @author Peter Karich, info@jetsli.de
  */
 public class BufferedSimpleOutputStream extends BufferedOutputStream {
 
-    public BufferedSimpleOutputStream(OutputStream out, int size) {
-        super(out, size);
-    }
+  public BufferedSimpleOutputStream(OutputStream out, int size) {
+    super(out, size);
+  }
 
-    public BufferedSimpleOutputStream(OutputStream out) {
-        super(out);        
-    }
+  public BufferedSimpleOutputStream(OutputStream out) {
+    super(out);
+  }
 
-    public final void writeFloat(float v) throws IOException {
-        writeInt(Float.floatToIntBits(v));
-    }
+  public final void writeFloat(float v) throws IOException {
+    writeInt(Float.floatToIntBits(v));
+  }
 
-    public final void writeInt(int v) throws IOException {
-        write((v >>> 24) & 0xFF);
-        write((v >>> 16) & 0xFF);
-        write((v >>> 8) & 0xFF);
-        write((v >>> 0) & 0xFF);
-    }
+  public final void writeInt(int v) throws IOException {
+    write((v >>> 24) & 0xFF);
+    write((v >>> 16) & 0xFF);
+    write((v >>> 8) & 0xFF);
+    write((v >>> 0) & 0xFF);
+  }
 }

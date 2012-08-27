@@ -22,107 +22,120 @@ import de.jetsli.graph.util.Helper;
  */
 class QTBranchNode<V> implements QTNode<V> {
 
-    QTNode node0;
-    QTNode node1;
-    QTNode node2;
-    QTNode node3;
+  QTNode node0;
+  QTNode node1;
+  QTNode node2;
+  QTNode node3;
 
-    public QTBranchNode() {
+  public QTBranchNode() {
+  }
+
+  @Override
+  public final QTNode get(int num) {
+    switch (num) {
+      case 0:
+        return node0;
+      case 1:
+        return node1;
+      case 2:
+        return node2;
+      default:
+        return node3;
+    }
+  }
+
+  @Override
+  public void set(int num, QTNode n) {
+    switch (num) {
+      case 0:
+        node0 = n;
+        return;
+      case 1:
+        node1 = n;
+        return;
+      case 2:
+        node2 = n;
+        return;
+      default:
+        node3 = n;
+        return;
+    }
+  }
+
+  @Override
+  public final boolean hasData() {
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return "B 0:" + node0.hasData() + " 1:" + node1.hasData() + " 2:" + node2.hasData() + " 3:"
+           + node3.hasData();
+  }
+
+  @Override
+  public long getMemoryUsageInBytes(int factor) {
+    // recursivly fetch the results
+    long all = 4 * Helper.sizeOfObjectRef(factor);
+    if (node0 != null) {
+      all += node0.getMemoryUsageInBytes(factor);
+    }
+    if (node1 != null) {
+      all += node1.getMemoryUsageInBytes(factor);
+    }
+    if (node2 != null) {
+      all += node2.getMemoryUsageInBytes(factor);
+    }
+    if (node3 != null) {
+      all += node3.getMemoryUsageInBytes(factor);
+    }
+    return all;
+  }
+
+  @Override
+  public int count() {
+    int all = 0;
+    if (node0 != null) {
+      all += node0.count();
+    }
+    if (node1 != null) {
+      all += node1.count();
+    }
+    if (node2 != null) {
+      all += node2.count();
+    }
+    if (node3 != null) {
+      all += node3.count();
+    }
+    return all;
+  }
+
+  @Override
+  public long getEmptyEntries(boolean onlyBranches) {
+    int all = 0;
+    if (node0 == null) {
+      all++;
+    } else {
+      all += node0.getEmptyEntries(onlyBranches);
     }
 
-    @Override
-    public final QTNode get(int num) {
-        switch (num) {
-            case 0:
-                return node0;
-            case 1:
-                return node1;
-            case 2:
-                return node2;
-            default:
-                return node3;
-        }
+    if (node1 == null) {
+      all++;
+    } else {
+      all += node1.getEmptyEntries(onlyBranches);
     }
 
-    @Override
-    public void set(int num, QTNode n) {
-        switch (num) {
-            case 0:
-                node0 = n;
-                return;
-            case 1:
-                node1 = n;
-                return;
-            case 2:
-                node2 = n;
-                return;
-            default:
-                node3 = n;
-                return;
-        }
+    if (node2 == null) {
+      all++;
+    } else {
+      all += node2.getEmptyEntries(onlyBranches);
     }
 
-    @Override
-    public final boolean hasData() {
-        return false;
+    if (node3 == null) {
+      all++;
+    } else {
+      all += node3.getEmptyEntries(onlyBranches);
     }
-
-    @Override
-    public String toString() {
-        return "B 0:" + node0.hasData() + " 1:" + node1.hasData() + " 2:" + node2.hasData() + " 3:" + node3.hasData();
-    }
-
-    @Override
-    public long getMemoryUsageInBytes(int factor) {
-        // recursivly fetch the results
-        long all = 4 * Helper.sizeOfObjectRef(factor);
-        if (node0 != null)
-            all += node0.getMemoryUsageInBytes(factor);
-        if (node1 != null)
-            all += node1.getMemoryUsageInBytes(factor);
-        if (node2 != null)
-            all += node2.getMemoryUsageInBytes(factor);
-        if (node3 != null)
-            all += node3.getMemoryUsageInBytes(factor);
-        return all;
-    }
-
-    @Override
-    public int count() {
-        int all = 0;
-        if (node0 != null)
-            all += node0.count();
-        if (node1 != null)
-            all += node1.count();
-        if (node2 != null)
-            all += node2.count();
-        if (node3 != null)
-            all += node3.count();
-        return all;
-    }
-
-    @Override
-    public long getEmptyEntries(boolean onlyBranches) {
-        int all = 0;
-        if (node0 == null)
-            all++;
-        else
-            all += node0.getEmptyEntries(onlyBranches);
-
-        if (node1 == null)
-            all++;
-        else
-            all += node1.getEmptyEntries(onlyBranches);
-
-        if (node2 == null)
-            all++;
-        else
-            all += node2.getEmptyEntries(onlyBranches);
-
-        if (node3 == null)
-            all++;
-        else
-            all += node3.getEmptyEntries(onlyBranches);
-        return all;
-    }
+    return all;
+  }
 }

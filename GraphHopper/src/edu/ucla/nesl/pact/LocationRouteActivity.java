@@ -61,7 +61,6 @@ public class LocationRouteActivity extends Activity {
   };
 
 
-
   private void sendRequestRouteMessage() {
     // Boelter Hall.
     double fromLat = 34.069144;
@@ -113,7 +112,7 @@ public class LocationRouteActivity extends Activity {
             builder.append(lons[ii]);
             builder.append(")\n");
           }
-          ((TextView)findViewById(R.id.txtRouteDetails)).setText(builder.toString());
+          ((TextView) findViewById(R.id.txtRouteDetails)).setText(builder.toString());
           break;
         default:
           super.handleMessage(msg);

@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * A service that provides a route between two points.
  *
- * Loads a map of Westwood (open-street-maps) and uses GraphHopper for routing.
- * See the companion {@link LocationRouteActivity} for an usage example.
+ * Loads a map of Westwood (open-street-maps) and uses GraphHopper for routing. See the companion
+ * {@link LocationRouteActivity} for an usage example.
  *
  * @author Kasturi Rangan Raghavan (kastur@gmail.com)
  */
@@ -94,7 +94,9 @@ public class LocationRouteService extends Service {
   }
 
   final Messenger mMessenger = new Messenger(new IncomingHandler());
+
   class IncomingHandler extends Handler {
+
     @Override
     public void handleMessage(Message msg) {
       switch (msg.what) {
@@ -119,9 +121,9 @@ public class LocationRouteService extends Service {
     double toLat = data.getDouble("toLat", 0.0);
     double toLon = data.getDouble("toLon", 0.0);
 
-    double latitudes[] = new double[] {fromLat, toLat};
-    double longitudes[] = new double[] {fromLon, toLon};
-    int nodes[] = new int[] {-1, -1};
+    double latitudes[] = new double[]{fromLat, toLat};
+    double longitudes[] = new double[]{fromLon, toLon};
+    int nodes[] = new int[]{-1, -1};
 
     Bundle bundle = new Bundle();
     bundle.putIntArray("nodes", nodes);

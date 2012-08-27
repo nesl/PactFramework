@@ -17,69 +17,73 @@ package de.jetsli.graph.reader;
 
 import de.jetsli.graph.storage.Graph;
 import de.jetsli.graph.util.Helper;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Data taken from here
- * http://algs4.cs.princeton.edu/44sp/
- * 
+ * Data taken from here http://algs4.cs.princeton.edu/44sp/
+ *
  * @author Peter Karich, info@jetsli.de
  */
 public class PrinctonReader {
 
-    private Graph g;
-    private InputStream is;
+  private Graph g;
+  private InputStream is;
 
-    public PrinctonReader(Graph graph) {
-        g = graph;
-    }
+  public PrinctonReader(Graph graph) {
+    g = graph;
+  }
 
-    public PrinctonReader setStream(InputStream is) {
-        this.is = is;
-        return this;
-    }
+  public PrinctonReader setStream(InputStream is) {
+    this.is = is;
+    return this;
+  }
 
-    public void read() {        
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * (1 << 10));
-        int lineNo = 0;
-        try {
-            lineNo++;
-            int nodes = Integer.parseInt(reader.readLine());
-            lineNo++;
-            int edges = Integer.parseInt(reader.readLine());
-            for (int i = 0; i < edges; i++) {
-                lineNo++;
-                String line = reader.readLine();
-                String args[] = line.split(" ");
-                int from = -1;
-                int to = -1;
-                double dist = -1;
-                int counter = 0;
-                for (int j = 0; j < args.length; j++) {
-                    if (args[j].isEmpty())
-                        continue;
+  public void read() {
+    BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * (1 << 10));
+    int lineNo = 0;
+    try {
+      lineNo++;
+      int nodes = Integer.parseInt(reader.readLine());
+      lineNo++;
+      int edges = Integer.parseInt(reader.readLine());
+      for (int i = 0; i < edges; i++) {
+        lineNo++;
+        String line = reader.readLine();
+        String args[] = line.split(" ");
+        int from = -1;
+        int to = -1;
+        double dist = -1;
+        int counter = 0;
+        for (int j = 0; j < args.length; j++) {
+          if (args[j].isEmpty()) {
+            continue;
+          }
 
-                    if (counter == 0)
-                        from = Integer.parseInt(args[j]);
-                    else if (counter == 1)
-                        to = Integer.parseInt(args[j]);
-                    else
-                        dist = Double.parseDouble(args[j]);
+          if (counter == 0) {
+            from = Integer.parseInt(args[j]);
+          } else if (counter == 1) {
+            to = Integer.parseInt(args[j]);
+          } else {
+            dist = Double.parseDouble(args[j]);
+          }
 
-                    counter++;
-                    continue;
-                }
-                if (counter != 3)
-                    throw new RuntimeException("incorrect read!? from:" + from + ", to:" + to + ", dist:" + dist);
-
-                g.edge(from, to, dist, CarFlags.FORWARD);
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("Problem in line " + lineNo, ex);
-        } finally {
-            Helper.close(reader);
+          counter++;
+          continue;
         }
+        if (counter != 3) {
+          throw new RuntimeException(
+              "incorrect read!? from:" + from + ", to:" + to + ", dist:" + dist);
+        }
+
+        g.edge(from, to, dist, CarFlags.FORWARD);
+      }
+    } catch (Exception ex) {
+      throw new RuntimeException("Problem in line " + lineNo, ex);
+    } finally {
+      Helper.close(reader);
     }
+  }
 }

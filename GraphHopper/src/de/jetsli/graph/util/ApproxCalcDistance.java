@@ -15,7 +15,9 @@
  */
 package de.jetsli.graph.util;
 
-import static java.lang.Math.*;
+import static java.lang.Math.cos;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.toRadians;
 //import static org.apache.commons.math3.util.FastMath.*;
 
 /**
@@ -25,31 +27,31 @@ import static java.lang.Math.*;
  */
 public class ApproxCalcDistance extends CalcDistance {
 
-    @Override
-    public double calcDistKm(double fromLat, double fromLon, double toLat, double toLon) {
-        double dLat = toRadians(toLat - fromLat);
-        double dLon = toRadians(toLon - fromLon);
-        double left = cos(toRadians((fromLat + toLat) / 2)) * dLon;
-        double normedDist = dLat * dLat + left * left;
-        return R * sqrt(normedDist);
-    }
+  @Override
+  public double calcDistKm(double fromLat, double fromLon, double toLat, double toLon) {
+    double dLat = toRadians(toLat - fromLat);
+    double dLon = toRadians(toLon - fromLon);
+    double left = cos(toRadians((fromLat + toLat) / 2)) * dLon;
+    double normedDist = dLat * dLat + left * left;
+    return R * sqrt(normedDist);
+  }
 
-    @Override
-    public double denormalizeDist(double normedDist) {
-        return R * sqrt(normedDist);
-    }
+  @Override
+  public double denormalizeDist(double normedDist) {
+    return R * sqrt(normedDist);
+  }
 
-    @Override
-    public double normalizeDist(double dist) {
-        double tmp = dist / R;
-        return tmp * tmp;
-    }
+  @Override
+  public double normalizeDist(double dist) {
+    double tmp = dist / R;
+    return tmp * tmp;
+  }
 
-    @Override
-    public double calcNormalizedDist(double fromLat, double fromLon, double toLat, double toLon) {
-        double dLat = toRadians(toLat - fromLat);
-        double dLon = toRadians(toLon - fromLon);
-        double left = cos(toRadians((fromLat + toLat) / 2)) * dLon;
-        return dLat * dLat + left * left;
-    }
+  @Override
+  public double calcNormalizedDist(double fromLat, double fromLon, double toLat, double toLon) {
+    double dLat = toRadians(toLat - fromLat);
+    double dLon = toRadians(toLon - fromLon);
+    double left = cos(toRadians((fromLat + toLat) / 2)) * dLon;
+    return dLat * dLat + left * left;
+  }
 }

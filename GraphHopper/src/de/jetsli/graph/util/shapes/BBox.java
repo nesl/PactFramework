@@ -20,86 +20,87 @@ package de.jetsli.graph.util.shapes;
  * maxLat. Equally to EX_GeographicBoundingBox in the ISO 19115 standard see
  * http://osgeo-org.1560.n6.nabble.com/Boundingbox-issue-for-discussion-td3875533.html
  *
- * Nice German overview:
- * http://www.geoinf.uni-jena.de/fileadmin/Geoinformatik/Lehre/Diplomarbeiten/DA_Andres.pdf
+ * Nice German overview: http://www.geoinf.uni-jena.de/fileadmin/Geoinformatik/Lehre/Diplomarbeiten/DA_Andres.pdf
  *
  * @author Peter Karich
  */
 public class BBox implements Shape {
 
-    // longitude (theta) = x, latitude (phi) = y
-    public final double minLon;
-    public final double maxLon;
-    public final double minLat;
-    public final double maxLat;
+  // longitude (theta) = x, latitude (phi) = y
+  public final double minLon;
+  public final double maxLon;
+  public final double minLat;
+  public final double maxLat;
 
-    public BBox(double minLon, double maxLon, double minLat, double maxLat) {
-        assert minLon < maxLon : "second longitude should be bigger than the first";
-        assert minLat < maxLat : "second latitude should be smaller than the first";
-        this.maxLat = maxLat;
-        this.minLon = minLon;
-        this.minLat = minLat;
-        this.maxLon = maxLon;
+  public BBox(double minLon, double maxLon, double minLat, double maxLat) {
+    assert minLon < maxLon : "second longitude should be bigger than the first";
+    assert minLat < maxLat : "second latitude should be smaller than the first";
+    this.maxLat = maxLat;
+    this.minLon = minLon;
+    this.minLat = minLat;
+    this.maxLon = maxLon;
+  }
+
+  public static BBox createEarthMax() {
+    return new BBox(-180.0, 180.0, -90.0, 90.0);
+  }
+
+  @Override
+  public boolean intersect(Shape s) {
+    if (s instanceof BBox) {
+      return intersect((BBox) s);
+    } else if (s instanceof Circle) {
+      return ((Circle) s).intersect(this);
     }
 
-    public static BBox createEarthMax() {
-        return new BBox(-180.0, 180.0, -90.0, 90.0);
+    throw new UnsupportedOperationException("unsupported shape");
+  }
+
+  @Override
+  public boolean contains(Shape s) {
+    if (s instanceof BBox) {
+      return contains((BBox) s);
+    } else if (s instanceof Circle) {
+      return contains((Circle) s);
     }
 
-    @Override
-    public boolean intersect(Shape s) {
-        if (s instanceof BBox)
-            return intersect((BBox) s);
-        else if (s instanceof Circle)
-            return ((Circle) s).intersect(this);
+    throw new UnsupportedOperationException("unsupported shape");
+  }
 
-        throw new UnsupportedOperationException("unsupported shape");
-    }
+  public boolean intersect(Circle s) {
+    return ((Circle) s).intersect(this);
+  }
 
-    @Override
-    public boolean contains(Shape s) {
-        if (s instanceof BBox)
-            return contains((BBox) s);
-        else if (s instanceof Circle)
-            return contains((Circle) s);
+  public boolean intersect(BBox o) {
+    // return (o.minLon < minLon && o.maxLon > minLon || o.minLon < maxLon && o.minLon >= minLon)
+    //  && (o.maxLat < maxLat && o.maxLat >= minLat || o.maxLat >= maxLat && o.minLat < maxLat);
+    return minLon < o.maxLon && minLat < o.maxLat && o.minLon < maxLon && o.minLat < maxLat;
+  }
 
-        throw new UnsupportedOperationException("unsupported shape");
-    }
+  @Override
+  public boolean contains(double lat, double lon) {
+    return lat < maxLat && lat >= minLat && lon < maxLon && lon >= minLon;
+  }
 
-    public boolean intersect(Circle s) {
-        return ((Circle) s).intersect(this);
-    }
+  public boolean contains(BBox b) {
+    return maxLat >= b.maxLat && minLat <= b.minLat && maxLon >= b.maxLon && minLon <= b.minLon;
+  }
 
-    public boolean intersect(BBox o) {
-        // return (o.minLon < minLon && o.maxLon > minLon || o.minLon < maxLon && o.minLon >= minLon)
-        //  && (o.maxLat < maxLat && o.maxLat >= minLat || o.maxLat >= maxLat && o.minLat < maxLat);
-        return minLon < o.maxLon && minLat < o.maxLat && o.minLon < maxLon && o.minLat < maxLat;
-    }
+  public boolean contains(Circle c) {
+    return contains(c.getBBox());
+  }
 
-    @Override
-    public boolean contains(double lat, double lon) {
-        return lat < maxLat && lat >= minLat && lon < maxLon && lon >= minLon;
-    }
+  @Override
+  public String toString() {
+    return minLon + "," + maxLon + "," + minLat + "," + maxLat;
+  }
 
-    public boolean contains(BBox b) {
-        return maxLat >= b.maxLat && minLat <= b.minLat && maxLon >= b.maxLon && minLon <= b.minLon;
-    }
+  public String toLessPrecisionString() {
+    return (float) minLon + "," + (float) maxLon + "," + (float) minLat + "," + (float) maxLat;
+  }
 
-    public boolean contains(Circle c) {
-        return contains(c.getBBox());
-    }
-
-    @Override
-    public String toString() {
-        return minLon + "," + maxLon + "," + minLat + "," + maxLat;
-    }
-
-    public String toLessPrecisionString() {
-        return (float) minLon + "," + (float) maxLon + "," + (float) minLat + "," + (float) maxLat;
-    }
-
-    @Override
-    public BBox getBBox() {
-        return this;
-    }
+  @Override
+  public BBox getBBox() {
+    return this;
+  }
 }
