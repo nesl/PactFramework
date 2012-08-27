@@ -1,5 +1,6 @@
 package edu.ucla.nesl.pact;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,14 +15,15 @@ public class PactEngine implements IPactEngine {
 
   private IRuleScheduler mRuleScheduler;
 
-  // probeContext (atomic contexts) -> set of rules.
-  private HashMap<String, HashSet<Rule>> mContextRules;
+  // probeContext (atomic contexts) -> set of rules. e.g. los_angles is an atomic context
+    // mMapStateToRules
+  private HashMap<String, HashSet<Rule>> mMapStateToRules;
 
-  // For each probe, track the probeContexts (atomic contexts).
-  private HashMap<String, HashSet<String>> mProbeContextsByProbeName;
+  // For each probe, track the probeState (probeName.atomic contexts).
+  private HashMap<String, HashSet<String>> mMapProbeNameToProbeState;
 
-  // Flattened representation of world state, but probeContext (atomic contexts).
-  private HashSet<String> mProbeContexts;
+  // Flattened representation of world state, but probeState (probeName.atomic context).
+  private HashSet<String> mProbeStates;
 
   private boolean mInitialized;
 
@@ -31,55 +33,51 @@ public class PactEngine implements IPactEngine {
   public PactEngine(IRuleScheduler ruleScheduler) {
     mRuleScheduler = ruleScheduler;
     mInitialized = false;
+    mProbeStates = new HashSet<String>();
+    mMapProbeNameToProbeState = new HashMap<String, HashSet<String>>();
+    mMapStateToRules = new HashMap<String, HashSet<Rule>>();
   }
 
   @Override
   public void loadFromConfig(RulesConfig rulesConfig) {
-    mProbeContexts = new HashSet<String>();
-    mProbeContextsByProbeName = new HashMap<String, HashSet<String>>();
-    mContextRules = new HashMap<String, HashSet<Rule>>();
     for (Rule rule : rulesConfig.getRules()) {
       for (List<String> clause : rule.getContexts()) {
-        for (String probeContext : clause) {
-          HashSet<Rule> ruleSet = mContextRules.get(probeContext);
+        for (String probeState : clause) {
+          HashSet<Rule> ruleSet = mMapStateToRules.get(probeState);
           if (ruleSet == null) {
             ruleSet = new HashSet<Rule>();
-            mContextRules.put(probeContext, ruleSet);
+            mMapStateToRules.put(probeState, ruleSet);
           }
           ruleSet.add(rule);
-
         }
       }
     }
-
     mInitialized = true;
   }
 
-
   /**
-   * Process data from a probe that reports changes its state.
+   * Process data from a probe that reports changes its probeContext.
    *
    * @param eventType ENTER_EVENT or EXIT_EVENT.
    */
   @Override
-  public void onProbeData(String probeName, int eventType, String state) {
-    final String probeState = probeName + "." + state;
+  public void onProbeData(String probeName, int eventType, String probeContext) {
+    final String probeState = probeName + "." + probeContext;
+      // check if config data has been loaded
     if (!mInitialized) {
       return;
     }
-
     initializeProbe(probeName);
     switch (eventType) {
       case ENTER_EVENT:
-        mProbeContextsByProbeName.get(probeName).add(probeState);
-        mProbeContexts.add(probeState);
+        mMapProbeNameToProbeState.get(probeName).add(probeState);
+        mProbeStates.add(probeState);
         break;
       case EXIT_EVENT:
-        mProbeContextsByProbeName.get(probeName).remove(probeState);
-        mProbeContexts.remove(probeState);
+        mMapProbeNameToProbeState.get(probeName).remove(probeState);
+        mProbeStates.remove(probeState);
         break;
     }
-
     if (eventType == ENTER_EVENT) {
       doExecuteRulesThatMentionProbeState(probeState);
     }
@@ -89,48 +87,44 @@ public class PactEngine implements IPactEngine {
    * Process data from a probe that reports it's full set of state.
    */
   @Override
-  public void onProbeData(String probeName, HashSet<String> states) {
+  public void onProbeData(String probeName, HashSet<String> contexts) {
     if (!mInitialized) {
       return;
     }
-
     initializeProbe(probeName);
-    // First remove the previous state from flattened set mProbeContexts
-    HashSet<String> previousProbeContexts = mProbeContextsByProbeName.get(probeName);
-    if (previousProbeContexts != null) {
-      mProbeContexts.removeAll(previousProbeContexts);
+    // First remove the previous state from flattened set mProbeStates
+    HashSet<String> previousProbeStates = mMapProbeNameToProbeState.get(probeName);
+    if (previousProbeStates != null) {
+      mProbeStates.removeAll(previousProbeStates);
     }
-
     // Prefix everything with probeName to make it a probeContext.
     HashSet<String> probeStates = new HashSet<String>();
-    for (String context : states) {
+    for (String context : contexts) {
       probeStates.add(probeName + "." + context);
     }
-
     // Put the probeContexts into the two state objects we maintain.
-    mProbeContextsByProbeName.put(probeName, probeStates);
-    mProbeContexts.addAll(probeStates);
+    mMapProbeNameToProbeState.put(probeName, probeStates);
+    mProbeStates.addAll(probeStates);
 
     doExecuteRulesThatMentionProbeState(probeStates);
-
   }
 
   private void initializeProbe(String probeName) {
-    if (mProbeContextsByProbeName.get(probeName) == null) {
-      mProbeContextsByProbeName.put(probeName, new HashSet<String>());
+    if (mMapProbeNameToProbeState.get(probeName) == null) {
+      mMapProbeNameToProbeState.put(probeName, new HashSet<String>());
     }
   }
 
   protected void doExecuteRulesThatMentionProbeState(String probeContext) {
-    HashSet<Rule> candidateMatches = mContextRules.get(probeContext);
+    HashSet<Rule> candidateMatches = mMapStateToRules.get(probeContext);
     if (candidateMatches != null)
       doExecuteRuleIfSatisfied(candidateMatches);
   }
 
-  protected void doExecuteRulesThatMentionProbeState(HashSet<String> probeContexts) {
+  protected void doExecuteRulesThatMentionProbeState(HashSet<String> probeStates) {
     HashSet<Rule> candidateMatches = new HashSet<Rule>();
-    for (String probeContext : probeContexts) {
-      HashSet<Rule> matches = mContextRules.get(probeContext);
+    for (String probeState : probeStates) {
+      HashSet<Rule> matches = mMapStateToRules.get(probeState);
       if (matches != null)
         candidateMatches.addAll(matches);
     }
@@ -138,23 +132,31 @@ public class PactEngine implements IPactEngine {
   }
 
   protected void doExecuteRuleIfSatisfied(HashSet<Rule> candidateMatches) {
+      ArrayList<Rule> mRulesToExecute = new ArrayList<Rule>();
     for (Rule candidateRule : candidateMatches) {
       for (List<String> clause : candidateRule.getContexts()) {
         // TODO: Push this inside the initialization of the rule.
         HashSet<String> clause_set = new HashSet<String>(clause);
         final int clause_size = clause_set.size();
-        clause_set.retainAll(mProbeContexts);
+          //retain elements in clause_set which matches those in mProbeStates
+        clause_set.retainAll(mProbeStates);
         final int final_clause_size = clause_set.size();
 
         if (clause_size == final_clause_size) {
-          doExecuteRule(candidateRule);
+            mRulesToExecute.add(candidateRule);
+          //doExecuteRule(candidateRule);
         }
       }
     }
+    doExecuteRule(mRulesToExecute);
   }
 
   public void doExecuteRule(Rule rule) {
     mRuleScheduler.scheduleRule(rule);
+  }
+
+  public void doExecuteRule(ArrayList<Rule> rulesToExecute) {
+    mRuleScheduler.scheduleRule(rulesToExecute);
   }
 
   public void dump() {
@@ -166,7 +168,7 @@ public class PactEngine implements IPactEngine {
     builder.append(prefix);
 
     builder.append(" Context = {");
-    for (String c : mProbeContexts) {
+    for (String c : mProbeStates) {
       builder.append(c);
       builder.append(",");
     }

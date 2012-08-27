@@ -8,6 +8,9 @@
       <directory url="file://$PROJECT_DIR$/NearbyPlacesProbe/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/PactFrameworkTests/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/PactTests/gen" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/GraphHopper/gen" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/GraphHopper/tests/gen" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/MapAwareMobility/gen" includeSubdirectories="true" />
     </excludeFromCompile>
     <resourceExtensions />
     <wildcardResourcePatterns>

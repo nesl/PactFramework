@@ -3,3 +3,4 @@
 *.class
 .idea/workspace.xml
 out/*
+GraphHopper/tests/gen/*
