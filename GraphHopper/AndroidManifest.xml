@@ -25,10 +25,10 @@
           package="de.jetsli"
           android:versionCode="1"
           android:versionName="1.0">
+
     <application android:label="@string/app_name">
         <service android:name="edu.ucla.nesl.pact.LocationRouteService"
-                 android:exported="true"
-                 android:permission="false">
+                 android:exported="true">
             <intent-filter>
                 <action android:name="edu.ucla.nesl.pact.LocationRouteService"/>
             </intent-filter>
