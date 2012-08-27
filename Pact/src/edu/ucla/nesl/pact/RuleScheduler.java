@@ -4,6 +4,8 @@ import android.content.Context;
 
 import edu.ucla.nesl.pact.config.Rule;
 
+import java.util.ArrayList;
+
 /**
  * Schedules rules so that they be run efficiently.
  *
@@ -23,5 +25,12 @@ public class RuleScheduler implements IRuleScheduler {
     IRunnableRule runnableRule = new RunnableRule();
     runnableRule.initialize(rule);
     runnableRule.run(mAndroidContext);
+  }
+
+    public void scheduleRule(ArrayList<Rule> rulesToExecute) {
+        // TODO: optimize rules if possible
+      for(Rule rule : rulesToExecute) {
+          scheduleRule(rule);
+      }
   }
 }
