@@ -48,7 +48,7 @@ public class PactServiceTest extends ServiceTestCase<PactService> {
     bundle.putLong(Probe.TIMESTAMP, System.currentTimeMillis());
     bundle.putStringArrayList(NearbyPlacesProbe.PLACES, places);
     Intent intent = new Intent(getContext(), PactService.class);
-    intent.setAction(PactService.ACTION_REPORT_DATA);
+    intent.setAction(PactService.ACTION_PROBE_DATA);
     intent.putExtras(bundle);
     startService(intent);
 
@@ -73,7 +73,7 @@ public class PactServiceTest extends ServiceTestCase<PactService> {
     Bundle bundle = new Bundle();
     bundle.putString(PactService.JSON_CONFIG, jsonConfig);
     Intent intent = new Intent(getContext(), PactService.class);
-    intent.setAction(PactService.ACTION_UPDATE_CONFIG);
+    intent.setAction(PactService.ACTION_CONFIG_UPDATE);
     intent.putExtras(bundle);
     startService(intent);
 

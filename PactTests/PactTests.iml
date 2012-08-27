@@ -37,8 +37,13 @@
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
     </content>
-    <orderEntry type="library" exported="" scope="TEST" name="testlibs" level="project" />
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="library" name="testlibs" level="project" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Pact" scope="PROVIDED" />
+    <orderEntry type="module" module-name="FunfLibrary" />
+    <orderEntry type="module" module-name="NearbyPlacesProbe" />
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/gson-1.7.1.jar!/" />
@@ -47,11 +52,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="jdk" jdkName="Android 4.0.3 Platform" jdkType="Android SDK" />
-    <orderEntry type="module" module-name="Pact" exported="" scope="PROVIDED" />
-    <orderEntry type="module" module-name="FunfLibrary" exported="" />
-    <orderEntry type="module" module-name="NearbyPlacesProbe" exported="" />
-    <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
 
