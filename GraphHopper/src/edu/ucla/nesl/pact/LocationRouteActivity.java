@@ -30,7 +30,7 @@ public class LocationRouteActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    mConnected = new AtomicBoolean(false);
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
@@ -40,7 +40,7 @@ public class LocationRouteActivity extends Activity {
         sendRequestRouteMessage();
       }
     });
-
+    mConnected = new AtomicBoolean(false);
     Intent intent = new Intent(this, LocationRouteService.class);
     bindService(intent, mServiceConnection, BIND_AUTO_CREATE | BIND_DEBUG_UNBIND);
   }
