@@ -1,5 +1,6 @@
 package edu.ucla.nesl.funf;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +12,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import edu.mit.media.funf.Utils;
@@ -33,6 +35,12 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
   private ProbeLocationListener passiveListener;
   private Location latestLocation;
   private PlacesManager mDB;
+
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    super.onHandleIntent(intent);
+
+  }
 
   @Override
   public Parameter[] getAvailableParameters() {
@@ -116,7 +124,8 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
   @Override
   protected void onDisable() {
     mLocationManager.removeUpdates(passiveListener);
-    mDB.clear();
+
+    //mDB.clear();
   }
 
   public void onRun(Bundle params) {
@@ -134,31 +143,30 @@ public class NearbyPlacesProbe extends Probe implements LocationKeys {
   @Override
   public void sendProbeData() {
     if (latestLocation != null) {
-      final String[] places = getInterestingPlaces(latestLocation);
+      final ArrayList<String> places = getNearbyPlaces(latestLocation);
       Bundle data = new Bundle();
       data.putParcelable(LOCATION, latestLocation);
-      data.putStringArray(PLACES, places);
+      data.putStringArrayList(PLACES, places);
       sendProbeData(Utils.millisToSeconds(latestLocation.getTime()), data);
     }
   }
 
-  private String[] getInterestingPlaces(Location location) {
+  private ArrayList<String> getNearbyPlaces(Location location) {
     float lat = (float) location.getLatitude();
     float lon = (float) location.getLongitude();
     float accuracy_meters = location.getAccuracy();
-    HashSet<String> set_of_places = mDB.query(lat, lon, accuracy_meters);
+    HashSet<String> placesSet = mDB.getNearbyPlaces(lat, lon, accuracy_meters);
 
-    if (set_of_places.size() > 0) {
+    if (placesSet.size() > 0) {
       Log.d(TAG,
-            "----FOUND: places" + set_of_places.size() + " within " + accuracy_meters + " meters.");
-      for (String s : set_of_places) {
+            "----FOUND: places" + placesSet.size() + " within " + accuracy_meters + " meters.");
+      for (String s : placesSet) {
         Log.v(TAG, "place >> " + s);
       }
     }
 
-    String[] places = new String[set_of_places.size()];
-    set_of_places.toArray(places);
-    return places;
+    ArrayList<String> placesList = new ArrayList<String>(placesSet);
+    return placesList;
   }
 
   private class ProbeLocationListener implements LocationListener {

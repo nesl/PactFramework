@@ -1,3 +1,5 @@
 .DS_Store
 */gen/*
 *.class
+.idea/workspace.xml
+out/*

@@ -23,11 +23,14 @@ public class PactEngine implements IPactEngine {
   // Flattened representation of world state, but probeContext (atomic contexts).
   private HashSet<String> mProbeContexts;
 
+  private boolean mInitialized;
+
   public static final int ENTER_EVENT = 1;
   public static final int EXIT_EVENT = 0;
 
   public PactEngine(IRuleScheduler ruleScheduler) {
     mRuleScheduler = ruleScheduler;
+    mInitialized = false;
   }
 
   @Override
@@ -48,6 +51,8 @@ public class PactEngine implements IPactEngine {
         }
       }
     }
+
+    mInitialized = true;
   }
 
 
@@ -59,7 +64,11 @@ public class PactEngine implements IPactEngine {
   @Override
   public void onProbeData(String probeName, int eventType, String state) {
     final String probeState = probeName + "." + state;
-    checkInit(probeName);
+    if (!mInitialized) {
+      return;
+    }
+
+    initializeProbe(probeName);
     switch (eventType) {
       case ENTER_EVENT:
         mProbeContextsByProbeName.get(probeName).add(probeState);
@@ -81,7 +90,11 @@ public class PactEngine implements IPactEngine {
    */
   @Override
   public void onProbeData(String probeName, HashSet<String> states) {
-    checkInit(probeName);
+    if (!mInitialized) {
+      return;
+    }
+
+    initializeProbe(probeName);
     // First remove the previous state from flattened set mProbeContexts
     HashSet<String> previousProbeContexts = mProbeContextsByProbeName.get(probeName);
     if (previousProbeContexts != null) {
@@ -102,7 +115,7 @@ public class PactEngine implements IPactEngine {
 
   }
 
-  private void checkInit(String probeName) {
+  private void initializeProbe(String probeName) {
     if (mProbeContextsByProbeName.get(probeName) == null) {
       mProbeContextsByProbeName.put(probeName, new HashSet<String>());
     }
@@ -110,13 +123,16 @@ public class PactEngine implements IPactEngine {
 
   protected void doExecuteRulesThatMentionProbeState(String probeContext) {
     HashSet<Rule> candidateMatches = mContextRules.get(probeContext);
-    doExecuteRuleIfSatisfied(candidateMatches);
+    if (candidateMatches != null)
+      doExecuteRuleIfSatisfied(candidateMatches);
   }
 
   protected void doExecuteRulesThatMentionProbeState(HashSet<String> probeContexts) {
     HashSet<Rule> candidateMatches = new HashSet<Rule>();
     for (String probeContext : probeContexts) {
-      candidateMatches.addAll(mContextRules.get(probeContext));
+      HashSet<Rule> matches = mContextRules.get(probeContext);
+      if (matches != null)
+        candidateMatches.addAll(matches);
     }
     doExecuteRuleIfSatisfied(candidateMatches);
   }

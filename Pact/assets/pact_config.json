@@ -1,0 +1,3 @@
+{
+    "pactConfig": {"rules":[{"name":"facebook_perturb_location","description":"Perturb location delivered to facebook if in a semantic place.","contexts":[["edu.ucla.nesl.NearbyPlacesProbe.place_of_worship"]],"packages":["com.facebook.katana"],"actions":[{"name":"location.perturb","params":"{}"}]}]}
+}

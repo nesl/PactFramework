@@ -23,8 +23,8 @@ public class PactService extends Service {
 
   private static final String TAG = "PactService";
 
-  public static final String ACTION_REPORT_DATA = "ACTION_REPORT_DATA";
-  public static final String ACTION_UPDATE_CONFIG = "ACTION_UPDATE_CONFIG";
+  public static final String ACTION_PROBE_DATA = "edu.ucla.nesl.pact.ACTION_PROBE_DATA";
+  public static final String ACTION_CONFIG_UPDATE = "edu.ucla.nesl.pact.ACTION_CONFIG_UPDATE";
 
   public static final String JSON_CONFIG = "JSON_CONFIG";
 
@@ -46,9 +46,9 @@ public class PactService extends Service {
     final String action = intent.getAction();
     final Bundle data = intent.getExtras();
     if (action != null && data != null) {
-      if (action.equals(ACTION_UPDATE_CONFIG)) {
+      if (action.equals(ACTION_CONFIG_UPDATE)) {
         onUpdateConfig(data);
-      } else if (action.equals(ACTION_REPORT_DATA)) {
+      } else if (action.equals(ACTION_PROBE_DATA)) {
         onProbeData(data);
       }
     }
@@ -79,12 +79,26 @@ public class PactService extends Service {
 
   protected void onProbeData(Bundle data) {
     final String probeName = data.getString(Probe.PROBE, "");
+    final String placesProbeName = NearbyPlacesProbe.class.getName();
 
-    if (probeName.equals(NearbyPlacesProbe.class.getName())) {
-      // TODO: Maybe it's more efficient to communicate via ArrayList ?
-      final ArrayList<String> stateArr = data.getStringArrayList(NearbyPlacesProbe.PLACES);
-      HashSet<String> stateSet = new HashSet<String>(stateArr);
-      mPactEngine.onProbeData(probeName, stateSet);
+    if (probeName.equals(placesProbeName)) {
+      final Integer event = data.getInt("EVENT", -1);
+      if (event == -1) {
+        // The probe data doesn't contain an Event, sot it must be a state reporting probe.
+        // TODO: Maybe it's more efficient to communicate via ArrayList ?
+        final ArrayList<String> stateArr = data.getStringArrayList(NearbyPlacesProbe.PLACES);
+        if (stateArr == null) {
+          return;
+        }
+        HashSet<String> stateSet = new HashSet<String>(stateArr);
+        mPactEngine.onProbeData(probeName, stateSet);
+      } else {
+        final String place = data.getString(NearbyPlacesProbe.PLACES);
+        if (place == null) {
+          return;
+        }
+        mPactEngine.onProbeData(probeName, event, place);
+      }
     }
   }
 }

@@ -1,3 +1,5 @@
+package edu.ucla.nesl.pact.unittests;
+
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
