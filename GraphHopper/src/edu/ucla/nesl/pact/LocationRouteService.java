@@ -40,7 +40,6 @@ public class LocationRouteService extends Service {
 
   Graph mGraph;
   Location2IDFullIndex mLocIndex;
-  DijkstraBidirection mRouter;
   AtomicBoolean mLoaded;
 
 
@@ -64,7 +63,6 @@ public class LocationRouteService extends Service {
         }
 
         mLocIndex = new Location2IDFullIndex(mGraph);
-        mRouter = new DijkstraBidirection(mGraph);
         Log.d(TAG, "----------SUCCESS! Loaded map.");
         mLoaded.set(true);
       }
@@ -142,7 +140,8 @@ public class LocationRouteService extends Service {
     int fromId = mLocIndex.findID(fromLat, fromLon);
     int toId = mLocIndex.findID(toLat, toLon);
 
-    Path path = mRouter.calcPath(fromId, toId);
+    DijkstraBidirection router = new DijkstraBidirection(mGraph);
+    Path path = router.calcPath(fromId, toId);
 
     double latitudes[] = new double[path.locations()];
     double longitudes[] = new double[path.locations()];
