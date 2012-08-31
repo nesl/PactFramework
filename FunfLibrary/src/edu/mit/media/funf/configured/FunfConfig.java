@@ -65,7 +65,7 @@ public class FunfConfig implements OnSharedPreferenceChangeListener {
 	public static final boolean
 		DEFAULT_DATA_UPLOAD_ON_WIFI_ONLY = false;
 	public static final String DEFAULT_DATA_REQUESTS = "{}"; // No requests
-      public static final String DEFAULT_PACT_CONFIG_KEY = "{\"rules\": {}}"; // No rules
+        public static final String DEFAULT_PACT_CONFIG_KEY = "{\"alias\":[],\"rules\": []}"; // No rules
 
 	
 	private final SharedPreferences prefs;

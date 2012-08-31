@@ -2,6 +2,8 @@ package edu.ucla.nesl.pact;
 
 import edu.ucla.nesl.pact.config.Rule;
 
+import java.util.ArrayList;
+
 /**
  * TODO: Give a one line description.
  *
@@ -10,5 +12,6 @@ import edu.ucla.nesl.pact.config.Rule;
 public interface IRuleScheduler {
 
   public void scheduleRule(Rule rule);
+  public void scheduleRule(ArrayList<Rule> rules);
 
 }
