@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import edu.ucla.nesl.pact.config.Alias;
 import edu.ucla.nesl.pact.config.Rule;
 import edu.ucla.nesl.pact.config.RulesConfig;
 
@@ -24,6 +25,7 @@ public class PactEngine implements IPactEngine {
 
   // Flattened representation of world state, but probeState (probeName.atomic context).
   private HashSet<String> mProbeStates;
+  private HashMap<String, Alias> mAliases;
 
   private boolean mInitialized;
 
@@ -36,19 +38,38 @@ public class PactEngine implements IPactEngine {
     mProbeStates = new HashSet<String>();
     mMapProbeNameToProbeState = new HashMap<String, HashSet<String>>();
     mMapStateToRules = new HashMap<String, HashSet<Rule>>();
+    mAliases = new HashMap<String, Alias>();
   }
 
   @Override
   public void loadFromConfig(RulesConfig rulesConfig) {
+    for(Alias alias : rulesConfig.getAlias()) {
+      mAliases.put(alias.getName(), alias);
+    }
+
     for (Rule rule : rulesConfig.getRules()) {
       for (List<String> clause : rule.getContexts()) {
         for (String probeState : clause) {
-          HashSet<Rule> ruleSet = mMapStateToRules.get(probeState);
-          if (ruleSet == null) {
-            ruleSet = new HashSet<Rule>();
-            mMapStateToRules.put(probeState, ruleSet);
+          if((mAliases.containsKey(probeState)) && (mAliases.get(probeState).getAliasType().equalsIgnoreCase("context"))){
+            for(String member : mAliases.get(probeState).getValues()){
+              HashSet<Rule> ruleSet = mMapStateToRules.get(member);
+              if(ruleSet == null) {
+                ruleSet = new HashSet<Rule>();
+                mMapStateToRules.put(member, ruleSet);
+              }
+              // Need to add for alias for packages
+              ruleSet.add(rule);
+            }
           }
-          ruleSet.add(rule);
+          else {
+            HashSet<Rule> ruleSet = mMapStateToRules.get(probeState);
+            if (ruleSet == null) {
+              ruleSet = new HashSet<Rule>();
+              mMapStateToRules.put(probeState, ruleSet);
+            }
+            // Need to add for alias for packages
+            ruleSet.add(rule);
+          }
         }
       }
     }

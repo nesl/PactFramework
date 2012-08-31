@@ -13,5 +13,32 @@
         ]
 	},
 
-	"pactConfig": {"rules":[{"name":"facebook_perturb_location","description":"Perturb location delivered to facebook if in a semantic place.","contexts":[["edu.ucla.nesl.NearbyPlacesProbe.fast_food"]],"packages":["com.facebook.katana"],"actions":[{"name":"location.perturb","params":"{}"}]}]}
+	"pactConfig":
+	{
+	    "alias":
+	    [
+	        {
+	            "name": "social_packages",
+	            "description": "packages for social networks",
+	            "aliasType": "package",
+	            "values": ["com.facebook.katana","com.twitter"]
+	        },
+	        {
+	            "name": "fast_food",
+	            "description": "contexts which are true at work",
+	            "aliasType": "context",
+	            "values": ["edu.ucla.nesl.NearbyPlacesProbe.fast_food", "edu.mit.media.funf.probe.builtin.ActivityProbe.highActivity"]
+	        }
+	    ],
+	    "rules":
+	    [
+	        {
+	            "name": "facebook_perturb_location",
+	            "description":"Perturb location delivered to facebook if in a semantic place.",
+	            "contexts":[["fast_food"]],
+	            "packages":["com.facebook.katana"],
+	            "actions":[{"name":"location.perturb","params":"{}"}]
+	        }
+	    ]
+	}
 }
